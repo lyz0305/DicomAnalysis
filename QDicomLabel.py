@@ -72,6 +72,7 @@ class QDicomLabel_contrast(QLabel):
         pass
 
         self.oldPoint = [pos.x(), pos.y()]
+        print(self.oldPoint)
 
 class QDicomLabel_zoom_pan(QLabel):
 
@@ -150,10 +151,30 @@ if __name__ == '__main__':
         def __init__(self, parent=None):
             super(MainWindow, self).__init__(parent)
             self.setWindowTitle("QDicomLabel Test")
+            # self.showMaximized()
+            self.resize(500,500)
+            widget = QWidget()
+            self.setAttribute(Qt.WA_Hover,True)
+            self.setMouseTracking(True)
             self.imagelabel = QDicomLabel_contrast()
+            self.imagelabel.setParent(widget)
+
+            # self.imagelabel.show()
             width = self.imagelabel.width()
             height = self.imagelabel.height()
-            self.setCentralWidget(self.imagelabel)
+            self.imagelabel.setGeometry(10, 20,  width,  height)
+
+
+            # layout = QHBoxLayout()
+            # layout.addWidget(self.imagelabel)
+            # # self.setCentralWidget(self.imagelabel)
+
+            #
+            # widget.setGeometry(40,40,256,256)
+            # widget.move(10, 10)
+            self.setCentralWidget(widget)
+            # widget.setLayout(layout)
+
             self.setMouseTracking(True)
             import dicom
             ds = dicom.read_file("G:\\SNAP_Signal_Analysis\\snap_simulation\\SNAP_TOF_Data\\Chang Cheng\\TOF\\IM_0180")
