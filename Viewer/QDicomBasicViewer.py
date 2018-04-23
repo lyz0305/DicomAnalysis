@@ -13,9 +13,9 @@ def displagImg(image):
     plt.imshow(image,cmap=plt.cm.gray)
     plt.show()
 
-class QDicomLabel_contrast(QLabel):
+class QDicomBasicViewer_contrast(QLabel):
     def __init__(self,parent=None):
-        super(QDicomLabel_contrast,self).__init__(parent)
+        super(QDicomBasicViewer_contrast,self).__init__(parent)
         self.setStyleSheet("background-color:black")
         self.setMouseTracking(True)
         self.setMinimumSize(1,1)
@@ -72,12 +72,12 @@ class QDicomLabel_contrast(QLabel):
         pass
 
         self.oldPoint = [pos.x(), pos.y()]
-        print(self.oldPoint)
 
-class QDicomLabel_zoom_pan(QLabel):
+
+class QDicomBasicViewer_zoom_pan(QLabel):
 
     def __init__(self,parent=None):
-        super(QDicomLabel_zoom_pan,self).__init__(parent)
+        super(QDicomBasicViewer_zoom_pan,self).__init__(parent)
         self.setStyleSheet("background-color:black")
         self.setMouseTracking(True)
         # self.setScaledContents(True)
@@ -156,13 +156,13 @@ if __name__ == '__main__':
             widget = QWidget()
             self.setAttribute(Qt.WA_Hover,True)
             self.setMouseTracking(True)
-            self.imagelabel = QDicomLabel_contrast()
+            self.imagelabel = QDicomBasicViewer_contrast()
             self.imagelabel.setParent(widget)
 
             # self.imagelabel.show()
             width = self.imagelabel.width()
             height = self.imagelabel.height()
-            self.imagelabel.setGeometry(10, 20,  width,  height)
+            self.imagelabel.setGeometry(100, 20,  width,  height)
 
 
             # layout = QHBoxLayout()
