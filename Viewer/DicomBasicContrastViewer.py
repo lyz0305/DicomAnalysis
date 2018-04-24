@@ -111,7 +111,7 @@ class DicomBasicContrastViewer(QLabel):
         self.oldPoint = [pos.x(), pos.y()]
         QMouseEvent.ignore()
 
-
+        # print([pos.x(), pos.y()])
 
 if __name__ == '__main__':
 

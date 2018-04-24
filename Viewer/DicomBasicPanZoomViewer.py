@@ -30,12 +30,12 @@ class DicomBasicPanZoomViewer(QLabel):
 
 
         self.contrastlabel = DicomBasicContrastViewer()
-        self.contrastlabelSize = [self.contrastlabel.height(),self.contrastlabel.width()]
+        self.contrastlabelSize = [self.contrastlabel.width(),self.contrastlabel.height()]
         self.contrastlabel.setParent(self)
         height = self.height()
         width = self.width()
-        x = height/2-self.contrastlabelSize[0]/2
-        y = width/2-self.contrastlabelSize[1]/2
+        x = width/2-self.contrastlabelSize[0]/2
+        y = height/2-self.contrastlabelSize[1]/2
         self.setGeometry(x,y,self.contrastlabelSize[0],self.contrastlabelSize[1])
         self.pressPoint = [-1, -1]
         self.releasePoint = [-1, -1]
@@ -45,7 +45,7 @@ class DicomBasicPanZoomViewer(QLabel):
     def contrastLabelPan(self,x,y):
         Log.LogTrace('DicomBasicPanZoomViewer, contrastLabelPan')
         geo = self.contrastlabel.geometry()
-        self.contrastlabel.setGeometry(geo.x()+x,geo.y()+y,geo.height(),geo.width())
+        self.contrastlabel.setGeometry(geo.x()+x,geo.y()+y,geo.width(),geo.height())
 
 
     def contraslLabelZoom(self,x,y):
@@ -55,9 +55,10 @@ class DicomBasicPanZoomViewer(QLabel):
         height = geo.height() + r*Setting.zoomRatio
         width = geo.width() + r*Setting.zoomRatio
 
-        x = self.height()/2 - height/2
-        y = self.width()/2 - width/2
-        self.contrastlabel.setGeometry(x,y,height,width)
+
+        x = self.width()/2 - width/2
+        y = self.height()/2 - height/2
+        self.contrastlabel.setGeometry(x,y,width,height)
 
     def setImage(self,image):
         '''
@@ -68,11 +69,11 @@ class DicomBasicPanZoomViewer(QLabel):
         Log.LogTrace('DicomBasicPanZoomViewer, setImage')
         self.originalImg = image
         self.contrastlabel.setImage(image)
-        height,width = image.shape
-        self.contrastlabel.resize(height,width)
-        x = self.height()/2 - height/2
-        y = self.width()/2 - width/2
-        self.contrastlabel.setGeometry(x,y,height,width)
+        width,height = image.shape
+        self.contrastlabel.resize(width,height)
+        x = self.width()/2 - width/2
+        y = self.height()/2 - height/2
+        self.contrastlabel.setGeometry(x,y,width,height)
 
         self.resizeEvent([])
 
@@ -125,7 +126,7 @@ class DicomBasicPanZoomViewer(QLabel):
         self.oldPoint = [pos.x(), pos.y()]
         QMouseEvent.ignore()
 
-        print([pos.x(), pos.y()])
+        # print([pos.x(), pos.y()])
 
 
 
