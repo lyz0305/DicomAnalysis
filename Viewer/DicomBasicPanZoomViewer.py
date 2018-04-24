@@ -56,8 +56,8 @@ class DicomBasicPanZoomViewer(QLabel):
         width = geo.width() + r*Setting.zoomRatio
 
 
-        x = self.width()/2 - width/2
-        y = self.height()/2 - height/2
+        x = geo.x()+geo.width()/2 - width/2
+        y = geo.y()+geo.height()/2 - height/2
         self.contrastlabel.setGeometry(x,y,width,height)
 
     def setImage(self,image):
