@@ -17,8 +17,8 @@ def LogTrace(name):
                                                T.tm_hour, T.tm_min, T.tm_sec))
 
 def removeLog():
-
-    os.remove(logname)
+    if os.path.exists(logname):
+        os.remove(logname)
 
 if __name__ == '__main__':
 
