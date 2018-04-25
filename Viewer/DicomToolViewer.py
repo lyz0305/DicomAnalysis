@@ -7,10 +7,13 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
 import Controller.Log as Log
+from Controller.DicomToolController import *
+from Model.DicomViewerModel import *
+import os
 
-class DicomViewerTool(QMainWindow):
+class DicomToolViewer(QMainWindow):
     def __init__(self, parent=None):
-        super(DicomViewerTool, self).__init__(parent)
+        super(DicomToolViewer, self).__init__(parent)
         Log.LogTrace('DicomViewerTool, Init')
         self.setWindowTitle("DicomTool")
         self.setStyleSheet("background-color:black")
@@ -22,6 +25,25 @@ class DicomViewerTool(QMainWindow):
         self.createMenus()
         self.createToolBars()
 
+        self.DicomToolController = DicomToolPageController()
+        self.InitModel()
+        self.InitGUI()
+
+    def InitModel(self):
+        LogTrace('DicomToolViewer, InitModel')
+        self.ImageNamesModel = ImageNamesModel()
+        self.DicomToolController.SetModel(self.ImageNamesModel)
+
+    def InitGUI(self):
+        LogTrace('DicomToolViewer, InitGUI')
+        widget = QWidget()
+        self.setCentralWidget(widget)
+        self.layout = QHBoxLayout()
+        widget.setLayout(self.layout)
+        # self.setLayout(self.layout)
+
+
+
     def createPanel(self):
 
         pass
@@ -31,13 +53,16 @@ class DicomViewerTool(QMainWindow):
         Log.LogTrace('DicomViewerTool, createActions')
         self.zoomAction = QAction(QIcon('Icons\\Zoom.png'), self.tr("Zoom"), self)
         self.zoomAction.setStatusTip(self.tr("Zoom"))
+        self.zoomAction.setCheckable(True)
 
         self.panAction = QAction(QIcon('Icons\\Pan.png'), self.tr("Pan"), self)
         self.panAction.setStatusTip(self.tr("Pan"))
+        self.panAction.setCheckable(True)
 
         self.contrastAction = QAction(QIcon('Icons\\Contrast.png'),self.tr("Contrast"),self)
-        self.panAction.setStatusTip(self.tr("Contrast"))
-        pass
+        self.contrastAction.setStatusTip(self.tr("Contrast"))
+        self.contrastAction.setCheckable(True)
+
 
     def createMenus(self):
         Log.LogTrace('DicomViewerTool, createMenus')
@@ -58,26 +83,42 @@ class DicomViewerTool(QMainWindow):
         # print(QEvent)
         QEvent.acceptProposedAction()
         # QEvent.ignore()
-        print('Enter')
+
 
     def dragLeaveEvent(self, QEvent):
         Log.LogTrace('DicomViewerTool, dragLeaveEvent')
         # QEvent.ignore()
-        print('Leave')
+
 
     def dragMoveEvent(self, QEvent):
         Log.LogTrace('DicomViewerTool, dragMoveEvent')
         # QEvent.ignore()
-        print('Move')
+
 
     def dragEvent(self, QEvent):
         Log.LogTrace('DicomViewerTool, dragEvent')
         # QEvent.ignore()
 
-        print('drag')
+
 
     def dropEvent(self, QEvent):
         Log.LogTrace('DicomViewerTool, dropEvent')
-        # QEvent.ignore()
         urls = QEvent.mimeData().urls()
-        print('drop')
+        folder = []
+        for url in urls:
+            folder.append(url.toLocalFile())
+        ImageNames = []
+        while len(folder) is not 0:
+
+            file = folder[0]
+            folder.pop(0)
+
+            if os.path.isdir(file):
+                files = os.listdir(file)
+                for f in files:
+                    folder.append(os.path.join(file,f))
+            elif os.path.isfile(file):
+                extension = os.path.splitext(file)
+                if len(extension[1]) == 0 or extension[1].lower() is '.dcm':
+                    ImageNames.append(file)
+        self.ImageNamesModel.SetImageNames(ImageNames)

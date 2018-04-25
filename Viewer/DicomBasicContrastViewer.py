@@ -10,11 +10,6 @@ import Viewer.EventDecision as Event
 import Controller.Log as Log
 import Controller.ParaSetting as Setting
 
-def displagImg(image):
-    import matplotlib.pyplot as plt
-    plt.figure()
-    plt.imshow(image,cmap=plt.cm.gray)
-    plt.show()
 
 class DicomBasicContrastViewer(QLabel):
     def __init__(self,parent=None):
@@ -119,19 +114,40 @@ if __name__ == '__main__':
         def __init__(self, parent=None):
             super(MainWindow, self).__init__(parent)
             self.setWindowTitle("QDicomLabel Test")
-            # self.showMaximized()
             self.resize(500,500)
-            widget = QWidget()
-            self.setAttribute(Qt.WA_Hover,True)
-            self.setMouseTracking(True)
-            self.imagelabel = DicomBasicContrastViewer()
-            self.imagelabel.setParent(widget)
 
-            # self.imagelabel.show()
-            width = self.imagelabel.width()
-            height = self.imagelabel.height()
+
+
+
+
+
+            widget = QWidget()
+            widget.setStyleSheet("background-color:black")
+            self.setCentralWidget(widget)
+            layout = QHBoxLayout()
+            widget.setLayout(layout)
+
+
+            listWidget = QListWidget()
+            listWidget.setFixedWidth(200)
+            listWidget.setStyleSheet("background: rgb(150, 150, 150)")
+
+            layout.addWidget(listWidget)
+
+            image_widget = QWidget()
+            layout.addWidget(image_widget)
+
+
+            # self.setMouseTracking(True)
+            self.imagelabel = DicomBasicContrastViewer()
+            self.imagelabel.setParent(image_widget)
+            #
+            # # self.imagelabel.show()
+            # width = self.imagelabel.width()
+            # height = self.imagelabel.height()
             self.imagelabel.setGeometry(100, 20,  320,  320)
 
+            # layout.addWidget(widget)
 
             # layout = QHBoxLayout()
             # layout.addWidget(self.imagelabel)
@@ -140,11 +156,11 @@ if __name__ == '__main__':
             #
             # widget.setGeometry(40,40,256,256)
             # widget.move(10, 10)
-            self.setCentralWidget(widget)
+
             # widget.setLayout(layout)
 
             self.setMouseTracking(True)
-            import dicom
+            import pydicom as dicom
             ds = dicom.read_file("G:\\SNAP_Signal_Analysis\\snap_simulation\\SNAP_TOF_Data\\Chang Cheng\\TOF\\IM_0180")
             image = np.array(ds.pixel_array)
             # displagImg(image)

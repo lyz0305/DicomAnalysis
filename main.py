@@ -8,10 +8,10 @@ import numpy as np
 from scipy.misc import imresize
 import qimage2ndarray
 from Viewer.DicomBasicContrastViewer import *
-from Viewer.DicomViewerTool import *
+from Viewer.DicomToolViewer import *
 
 app = QApplication(sys.argv)
-window = DicomViewerTool()
+window = DicomToolViewer()
 # window.setWindowFlags(window.windowFlags() | Qt.WindowStaysOnTopHint)
 window.show()
 app.exec_()
