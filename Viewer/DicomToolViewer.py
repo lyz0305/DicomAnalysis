@@ -39,9 +39,9 @@ class DicomToolViewer(QMainWindow):
         widget = QWidget()
         self.setCentralWidget(widget)
         self.layout = QHBoxLayout()
+        self.layout.setContentsMargins(0,0,0,0)
         widget.setLayout(self.layout)
-        # self.setLayout(self.layout)
-
+        self.DicomToolController.SetLayout(self.layout)
 
 
     def createPanel(self):

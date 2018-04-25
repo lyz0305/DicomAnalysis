@@ -125,6 +125,7 @@ if __name__ == '__main__':
             widget.setStyleSheet("background-color:black")
             self.setCentralWidget(widget)
             layout = QHBoxLayout()
+            layout.setContentsMargins(0,0,0,0)
             widget.setLayout(layout)
 
 
@@ -132,10 +133,14 @@ if __name__ == '__main__':
             listWidget.setFixedWidth(200)
             listWidget.setStyleSheet("background: rgb(150, 150, 150)")
 
-            layout.addWidget(listWidget)
+            testWidget = QWidget()
+            testWidget.setStyleSheet("background: rgb(250, 250, 150)")
+            layout.addWidget(testWidget)
+            # layout.addWidget(listWidget)
+            # layout.addStretch()
 
             image_widget = QWidget()
-            layout.addWidget(image_widget)
+            # layout.addWidget(image_widget)
 
 
             # self.setMouseTracking(True)

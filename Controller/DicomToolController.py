@@ -61,7 +61,7 @@ class DicomToolThumbnailController(DicomToolBasePanelController,Observe):
         SequenceInfos = self.SequenceInfoModel.GetSequenceInfo()
         if self.listWidget is None:
             listWidget = QListWidget()
-            listWidget.setFixedWidth(200)
+            listWidget.setFixedWidth(150)
             listWidget.setStyleSheet("background: rgb(150, 150, 150)")
 
             self.layout.addWidget(listWidget)
@@ -131,6 +131,7 @@ class DicomToolPageController(Observe):
         mainPanalLayout = QHBoxLayout()
 
         self.layout.addLayout(thumbnailLayout)
+        self.layout.addStretch()
         self.layout.addLayout(mainPanalLayout)
         self.MainPanelController.SetLayout(mainPanalLayout)
         self.ThumbnailControlelr.SetLayout(thumbnailLayout)
