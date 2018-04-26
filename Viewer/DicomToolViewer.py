@@ -7,9 +7,12 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
 import Controller.Log as Log
-from Controller.DicomToolController import *
+from Controller.DicomViewerController import *
 from Model.DicomViewerModel import *
 import os
+
+
+
 
 class DicomToolViewer(QMainWindow):
     def __init__(self, parent=None):

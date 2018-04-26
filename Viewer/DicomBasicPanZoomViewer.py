@@ -11,18 +11,15 @@ import Controller.Log as Log
 import Viewer.EventDecision as Event
 import Controller.ParaSetting as Setting
 
-def displagImg(image):
-    import matplotlib.pyplot as plt
-    plt.figure()
-    plt.imshow(image,cmap=plt.cm.gray)
-    plt.show()
-
 
 class DicomBasicPanZoomViewer(QLabel):
 
     def __init__(self,parent=None):
         super(DicomBasicPanZoomViewer,self).__init__(parent)
         Log.LogTrace('DicomBasicPanZoomViewer, Init')
+        self.PanAble = True
+        self.ZoomAble = True
+        self.ContrastAble = True
         self.setStyleSheet("background-color:black")
         self.setMouseTracking(True)
         self.setMinimumSize(1,1)
@@ -109,6 +106,19 @@ class DicomBasicPanZoomViewer(QLabel):
         QMouseEvent.ignore()
         pass
 
+    def SetPanAble(self, able):
+        Log.LogTrace('DicomBasicPanZoomViewer, SetPanAble')
+        self.PanAble = able
+
+    def SetZoomAble(self, able):
+        Log.LogTrace('DicomBasicPanZoomViewer, SetZoomAble')
+        self.ZoomAble = able
+
+    def SetContrastAble(self, able):
+        Log.LogTrace('DicomBasicPanZoomViewer, SetContrastAble')
+        self.ContrastAble = able
+        self.contrastlabel.SetContrastAble(able)
+
     def mouseMoveEvent(self, QMouseEvent):
         Log.LogTrace('DicomBasicPanZoomViewer, mouseMoveEvent')
         pos = QMouseEvent.pos()
@@ -116,10 +126,10 @@ class DicomBasicPanZoomViewer(QLabel):
 
         if self.pressPoint[0] is not -1 and self.pressPoint[1] is not -1:
 
-            if Event.MouseMoveEvent(QMouseEvent) == Event.Pan:
+            if self.PanAble and Event.MouseMoveEvent(QMouseEvent) == Event.Pan:
                 self.contrastLabelPan(self.currentPoint[0]-self.oldPoint[0],self.currentPoint[1]-self.oldPoint[1])
 
-            elif Event.MouseMoveEvent(QMouseEvent) == Event.Zoom:
+            elif self.ZoomAble and Event.MouseMoveEvent(QMouseEvent) == Event.Zoom:
                 self.contraslLabelZoom(self.currentPoint[0]-self.oldPoint[0],self.currentPoint[1]-self.oldPoint[1])
 
 

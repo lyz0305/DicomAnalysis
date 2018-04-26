@@ -17,6 +17,9 @@ class DicomBasicContrastViewer(QLabel):
         Log.LogTrace('DicomBasicContrastViewer, Init')
         self.setStyleSheet("background-color:black")
         self.setMouseTracking(True)
+        self.ContrastAble = True
+        self.originalImg = None
+        self.displayImg = None
         self.setMinimumSize(1,1)
         self.pressPoint = [-1,-1]
         self.releasePoint = [-1,-1]
@@ -26,6 +29,10 @@ class DicomBasicContrastViewer(QLabel):
         self.contrast = dict()
         self.contrast['center'] = -9999
         self.contrast['width'] = -9999
+
+    def SetContrastAble(self, able):
+        Log.LogTrace('DicomBasicContrastViewer, SetContrastAble')
+        self.ContrastAble = able
 
     def setContrast(self,center,width):
         Log.LogTrace('DicomBasicContrastViewer, setContrast')
@@ -53,6 +60,8 @@ class DicomBasicContrastViewer(QLabel):
 
     def updateImgSize(self):
         Log.LogTrace('DicomBasicContrastViewer, updateImgSize')
+        if self.originalImg is None:
+            return
         size = [self.height(), self.width()]
         zoomImg = imresize(self.originalImg, [int(size[0]), int(size[1])], 'lanczos', mode='I')
         self.displayImg = zoomImg
@@ -62,6 +71,8 @@ class DicomBasicContrastViewer(QLabel):
 
     def updateViewer(self):
         Log.LogTrace('DicomBasicContrastViewer, updateViewer')
+        if self.displayImg is None:
+            return
         MIN = (2*self.contrast['center'] - self.contrast['width'])/2.0 + 0.5
         MAX = (2*self.contrast['center'] + self.contrast['width'])/2.0 + 0.5
         dFactor = 255.0/(MAX-MIN)
@@ -93,7 +104,7 @@ class DicomBasicContrastViewer(QLabel):
         pos = QMouseEvent.pos()
         self.currentPoint = [pos.x(), pos.y()]
         if self.pressPoint[0] is not -1 and self.pressPoint[1] is not -1:
-            if Event.MouseMoveEvent(QMouseEvent) == Event.Contrast:
+            if self.ContrastAble and Event.MouseMoveEvent(QMouseEvent) == Event.Contrast:
                 dx = self.currentPoint[0] - self.oldPoint[0]
                 dy = self.currentPoint[1] - self.oldPoint[1]
                 self.setContrast(center=self.contrast['center'] + dx*Setting.contrastRatio,

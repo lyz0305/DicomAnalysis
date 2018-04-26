@@ -2,7 +2,7 @@
 from Controller.Log import *
 import sys
 
-class DicomToolBasePanelController:
+class DicomViewerBasePanelController:
 
     def __init__(self):
         LogTrace('DicomToolBaseController, Init')
