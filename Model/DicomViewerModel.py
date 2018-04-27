@@ -54,23 +54,71 @@ class SequenceInfoModel(BaseModel):
         Log.LogTrace('SequenceInfoModel,GetSequenceInfo')
         return self.SequenceInfo.copy()
 
-
-
-class DisplayIDModel(BaseModel):
+class DisplayImageModel(BaseModel):
     def __init__(self):
-        Log.LogTrace('DisplayIDModel, Init')
-        super(DisplayIDModel,self).__init__()
-        self.Name = 'DisplayIDModel'
-        self.ID = []
-    def SetID(self, ID):
-        Log.LogTrace('DisplayIDModel, SetID')
-        if ID is not self.ID:
-            self.ID = ID
-            self.Notify()
-    def GetID(self, ID):
-        Log.LogTrace('DisplayIDModel, GetID')
-        return self.ID
+        Log.LogTrace('DisplayImageModel, Init')
+        super(DisplayImageModel, self).__init__()
+        self.Name = 'DisplayImageModel'
+        self.Img = None
 
+    def setImage(self, image):
+        Log.LogTrace('DisplayImageModel, setImage')
+        if image is not self.Img:
+            self.Img = image
+            self.Notify()
+
+    def getImage(self):
+        Log.LogTrace('DisplayImageModel, getImage')
+        return self.Img
+
+
+class DisplayInfoModel(BaseModel):
+    def __init__(self):
+        Log.LogTrace('DisplayInfoModel, Init')
+        super(DisplayInfoModel,self).__init__()
+        self.Name = 'DisplayInfoModel'
+        self.patientName = None
+        self.seriesName = None
+        self.instanceNumber = None
+
+    def setDisplayInfo(self, patientName, seriesName, instanceNumber):
+        Log.LogTrace('DisplayInfoModel, setDisplayInfo')
+        if patientName is not self.patientName or seriesName is not self.seriesName\
+                or instanceNumber is not self.instanceNumber:
+            self.patientName = patientName
+            self.seriesName = seriesName
+            self.instanceNumber = instanceNumber
+            self.Notify()
+
+    def getPatientName(self):
+        LogTrace('DisplayInfoModel, getPatientName')
+        return self.patientName
+
+    def getSeriesName(self):
+        LogTrace('DisplayIDModel, getSeriesName')
+        return self.seriesName
+
+    def getInstanceNumber(self):
+        LogTrace('DisplayIDModel, getInstanceNumber')
+        return self.instanceNumber
+
+class DisplayModelsModel(BaseModel):
+
+    def __init__(self):
+        Log.LogTrace('DisplayModelModel, Init')
+        super(DisplayModelsModel, self).__init__()
+        self.Name = 'DisplayModelModel'
+        self.DisplayModels = []
+
+    def setDisplayModels(self, models):
+        Log.LogTrace('DisplayModelModel, setDisplayModels')
+        if models is not self.DisplayModels:
+            self.DisplayModels = models
+            self.Notify()
+
+    def getDisplayModels(self):
+        Log.LogTrace('DisplayModelModel, getDisplayModels')
+        return self.DisplayModels
 
 if __name__=='__main__':
 

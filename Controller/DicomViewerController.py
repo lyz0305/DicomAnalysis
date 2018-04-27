@@ -6,10 +6,36 @@ from Model.DicomViewerModel import *
 import SimpleITK as sitk
 from Controller.TagName import Tags
 from Viewer.DicomViewViewer import ThumbnailViewer
-from Viewer.AuxiliaryClass import CharacterDisplayLabel
+from Viewer.AuxiliaryClass import CharacterDisplayLabel, ThumbnailListWidget
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from Controller import ParaSetting
+
+
+class DicomToolViewController(DicomViewerBasePanelController, Observe):
+
+    def __init__(self):
+        LogTrace('DicomToolViewController, Init')
+        self.Name = 'DicomToolViewController'
+        super(DicomToolViewController, self).__init__()
+        self.layout = QHBoxLayout()
+
+    def InitGUI(self):
+        LogTrace('DicomToolViewController, InitGUI')
+
+    def InitModel(self):
+        LogTrace('DicomToolViewController, InitModel')
+
+    def Update(self,model):
+        LogTrace('DicomToolViewController, Update')
+
+    def SetModel(self, model):
+        LogTrace('DicomToolViewController, SetModel,'+model.Name)
+
+    def SetLayout(self, layout):
+        LogTrace('DicomToolViewController, SetLayout')
+        self.layout = layout
 
 class DicomToolMainPanelController(DicomViewerBasePanelController, Observe):
 
@@ -18,18 +44,25 @@ class DicomToolMainPanelController(DicomViewerBasePanelController, Observe):
         self.Name = 'DicomToolMainPanelController'
         super(DicomToolMainPanelController,self).__init__()
         self.layout = QHBoxLayout()
+        self.DisplayModelsModel = None
 
     def InitGUI(self):
         LogTrace('DicomToolMainPanelController, InitGUI')
 
     def InitModel(self):
         LogTrace('DicomToolMainPanelController, InitModel')
+        self.DisplayModelsModel = DisplayModelsModel()
+
 
     def Update(self,model):
         LogTrace('DicomToolMainPanelController, Update')
 
     def SetModel(self, model):
         LogTrace('DicomToolMainPanelController, SetModel,'+model.Name)
+        if model.Name == self.DisplayModelsModel.Name:
+            self.DisplayModelsModel.Name = model
+            self.DisplayModelsModel.AddObserves(self)
+
 
     def SetLayout(self, layout):
         LogTrace('DicomToolMainPanelController, SetLayout')
@@ -41,10 +74,11 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
         LogTrace('DicomToolThumbnailController, Init')
         super(DicomToolThumbnailController,self).__init__()
         self.Name = 'DicomToolThumbnailController'
-        self.listWidget = None
+        self.listWidgets = []
         self.layout = QHBoxLayout()
         self.SequenceModel = SequenceModel()
         self.SequenceInfoModel = SequenceInfoModel()
+        self.DisplayModelsModel = DisplayModelsModel()
 
     def InitGUI(self):
         LogTrace('DicomToolThumbnailController, InitGUI')
@@ -57,22 +91,32 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
         if model.Name == self.SequenceInfoModel.Name:
             self.SequenceInfoChange()
 
-    def SequenceInfoChange(self):
-        LogTrace('DicomToolThumbnailController, SequenceNamesChange')
+    def updatePatient(self):
+        LogTrace('DicomToolThumbnailController, updatePatient')
         SequenceInfos = self.SequenceInfoModel.GetSequenceInfo()
-        if self.listWidget is None:
-            listWidget = QListWidget()
-            listWidget.setFixedWidth(150)
-            # listWidget.setStyleSheet("QListWidget: item { border-bottom: 5px solid black; }")
-            listWidget.setStyleSheet("background: rgb(150, 150, 150)")
-            # listWidget.setStyleSheet("QListWidget: item { border-bottom: 5px solid black; }; background: rgb(150, 150, 150)")
 
+        patients = None
+        for patientName in SequenceInfos.keys():
+            for listWidget in self.listWidgets:
+                if patientName is not listWidget.getPatientName:
+                    patients = patientName
+
+        if patients is None:
+            listWidget = ThumbnailListWidget()
+            listWidget.setPatientName(patientName)
+            listWidget.setContentsMargins(0, 0, 0, 0)
+            # listWidget.verticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            listWidget.horizontalOffset()
+            # listWidget.horizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            # listWidget.horizontalScrollBar().setDisabled(True)
+            listWidget.setFixedWidth(ParaSetting.ThumbnailWidgetWidth)
+            listWidget.setStyleSheet("background-color: rgb(150, 150, 150)")
             self.layout.addWidget(listWidget)
-            self.listWidget = listWidget
+            self.listWidgets.append(listWidget)
+            dicomName = list(list(SequenceInfos[patientName].values())[0].values())[0]
 
-            name = list(list(SequenceInfos.values())[0].values())[0]
             reader = sitk.ImageFileReader()
-            reader.SetFileName(name)
+            reader.SetFileName(dicomName)
             reader.LoadPrivateTagsOn()
             reader.ReadImageInformation()
             patient_name = reader.GetMetaData(Tags['PatientName'])
@@ -84,18 +128,56 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
             patient_info.setBackgroundColor(225,109,9)
 
             patient_info_widgetItem = QListWidgetItem()
-            patient_info_widgetItem.setSizeHint(QSize(40,60))
-            self.listWidget.addItem(patient_info_widgetItem)
-            self.listWidget.setItemWidget(patient_info_widgetItem,patient_info)
 
-            thum = ThumbnailViewer()
-            thum.setSeriesInfo(list(SequenceInfos.keys())[0])
-            thum_widgetItem = QListWidgetItem()
-            self.listWidget.addItem(thum_widgetItem)
-            self.listWidget.setItemWidget(thum_widgetItem, thum)
+            print(ParaSetting.ThumbnailPatientNameHeight, ParaSetting.ThumbnailWidgetWidth)
+            # patient_info_widgetItem.setSizeHint(QSize(150, 40))
+            patient_info_widgetItem.setSizeHint(QSize(ParaSetting.ThumbnailWidgetWidth,ParaSetting.ThumbnailPatientNameHeight))
+            # patient_info_widgetItem.setSizeHint(QSize(ParaSetting.ThumbnailPatientNameHeight,ParaSetting.ThumbnailWidgetWidth))
+            listWidget.addItem(patient_info_widgetItem)
+            listWidget.setItemWidget(patient_info_widgetItem,patient_info)
+            #
+            # thum = ThumbnailViewer()
+            # thum.setSeriesName('random')
+            # thum_widgetItem = QListWidgetItem()
+            # thum_widgetItem.setSizeHint(QSize(ParaSetting.ThumbnailWidgetWidth, ParaSetting.ThumbnailViewHeight))
+            # # thum_widgetItem.setSizeHint(QSize(ParaSetting.ThumbnailViewHeight, ParaSetting.ThumbnailWidgetWidth))
+            # listWidget.addItem(thum_widgetItem)
+            # listWidget.setItemWidget(thum_widgetItem, thum)
 
-        else:
-            pass
+
+    def SequenceInfoChange(self):
+        LogTrace('DicomToolThumbnailController, SequenceNamesChange')
+        SequenceInfos = self.SequenceInfoModel.GetSequenceInfo()
+        self.updatePatient()
+        for patientName in SequenceInfos.keys():
+            for listWidget in self.listWidgets:
+
+                if listWidget.count() == len( SequenceInfos[patientName].keys()) + 1:
+                    continue
+
+                if patientName is listWidget.getPatientName():
+                    series = SequenceInfos[patientName]
+                    n = listWidget.count()
+                    for sery in series.keys():
+                        Exist = False
+                        for i in range(n):
+                            widgetItem = listWidget.item(i)
+                            widget = listWidget.itemWidget(widgetItem)
+
+                            if isinstance(widget, ThumbnailViewer):
+                                if sery is widget.getSeriesName():
+                                    Exist = True
+
+                        if Exist is False:
+                            thum = ThumbnailViewer()
+                            thum.setSeriesName(sery)
+                            thum_widgetItem = QListWidgetItem()
+                            thum_widgetItem.setSizeHint(QSize(ParaSetting.ThumbnailWidgetWidth, ParaSetting.ThumbnailViewHeight))
+
+                            # thum_widgetItem.setSizeHint(QSize(ParaSetting.ThumbnailViewHeight, ParaSetting.ThumbnailWidgetWidth))
+                            listWidget.addItem(thum_widgetItem)
+                            listWidget.setItemWidget(thum_widgetItem, thum)
+
 
     def SetModel(self, model):
         LogTrace('DicomToolThumbnailController, SetModel,'+model.Name)
@@ -104,6 +186,9 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
             model.AddObserves(self)
         elif model.Name is self.SequenceInfoModel.Name:
             self.SequenceInfoModel = model
+            model.AddObserves(self)
+        elif model.Name is self.DisplayModelsModel.Name:
+            self.DisplayModelsModel = model
             model.AddObserves(self)
 
 
@@ -128,6 +213,7 @@ class DicomToolPageController(Observe):
         self.ImageNamesModel = ImageNamesModel()
         self.SequenceModel = SequenceModel()
         self.SequenceInfoModel = SequenceInfoModel()
+        self.DisplayModelsModel = DisplayModelsModel()
 
         self.ImageNamesModel.AddObserves(self)
         self.SequenceModel.AddObserves(self)
@@ -149,6 +235,8 @@ class DicomToolPageController(Observe):
         self.MainPanelController.SetModel(self.SequenceModel)
         self.ThumbnailControlelr.SetModel(self.SequenceModel)
         self.ThumbnailControlelr.SetModel(self.SequenceInfoModel)
+        self.MainPanelController.SetModel(self.DisplayModelsModel)
+        self.ThumbnailControlelr.SetModel(self.DisplayModelsModel)
 
     def SetLayout(self, layout):
         LogTrace('DicomToolMainController, SetLayout')
@@ -190,11 +278,14 @@ class DicomToolPageController(Observe):
             series_description = reader.GetMetaData(Tags['SeriesDescription'])
             series_number = reader.GetMetaData(Tags['SeriesNumber'])
             instance_number = reader.GetMetaData(Tags['InstanceNumber'])
+            patient_name = reader.GetMetaData(Tags['PatientName'])
             name = series_number + ' ' + series_description
             SequenceInfo = self.SequenceInfoModel.GetSequenceInfo()
-            if name not in SequenceInfo.keys():
-                SequenceInfo[name] = dict()
-            SequenceInfo[name][str(instance_number)] = ImageNames[i]
+            if patient_name not in SequenceInfo.keys():
+                SequenceInfo[patient_name] = dict()
+            if name not in SequenceInfo[patient_name].keys():
+                SequenceInfo[patient_name][name] = dict()
+            SequenceInfo[patient_name][name][int(instance_number)] = ImageNames[i]
 
             self.SequenceInfoModel.SetSequenceInfo(SequenceInfo)
 
