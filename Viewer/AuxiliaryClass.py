@@ -18,12 +18,16 @@ class CharacterDisplayLabel(QLabel):
         self.setFixedHeight(60)
         self.setAlignment(Qt.AlignCenter)
 
-    def SetBachgroundColor(self, r,g,b):
-        LogTrace('CharacterDisplayLabel, SetBachgroundColor')
+    def setBackgroundColor(self, r,g,b):
+        LogTrace('CharacterDisplayLabel, setBackgroundColor')
         self.setStyleSheet("background: rgb(%d,%d,%d)"%(r,g,b))
 
-    def SetCharacterColor(self, color):
-        LogTrace('CharacterDisplayLabel, SetBachgroundColor')
+    def setCharacterColor(self, color):
+        LogTrace('CharacterDisplayLabel, setCharacterColor')
         pa = QPalette()
         pa.setColor(QPalette.WindowText, color)
         self.setPalette(pa)
+
+    def setFixedHeight(self, height):
+        LogTrace('CharacterDisplayLabel, setFixedHeight')
+        super(CharacterDisplayLabel, self).setFixedHeight(height)

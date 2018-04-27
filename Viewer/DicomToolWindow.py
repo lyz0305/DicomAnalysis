@@ -14,9 +14,9 @@ import os
 
 
 
-class DicomToolViewer(QMainWindow):
+class DicomToolWindow(QMainWindow):
     def __init__(self, parent=None):
-        super(DicomToolViewer, self).__init__(parent)
+        super(DicomToolWindow, self).__init__(parent)
         Log.LogTrace('DicomViewerTool, Init')
         self.setWindowTitle("DicomTool")
         self.setStyleSheet("background-color:black")

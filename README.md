@@ -5,7 +5,7 @@ Environment:
 
 python 3.5
 Qt5.1
-pydicom-1.0.2
+SimpleITK
 
 the explanation of Version:
 

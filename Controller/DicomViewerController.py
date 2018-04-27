@@ -63,7 +63,10 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
         if self.listWidget is None:
             listWidget = QListWidget()
             listWidget.setFixedWidth(150)
+            # listWidget.setStyleSheet("QListWidget: item { border-bottom: 5px solid black; }")
             listWidget.setStyleSheet("background: rgb(150, 150, 150)")
+            # listWidget.setStyleSheet("QListWidget: item { border-bottom: 5px solid black; }; background: rgb(150, 150, 150)")
+
             self.layout.addWidget(listWidget)
             self.listWidget = listWidget
 
@@ -77,15 +80,16 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
 
             patient_info = CharacterDisplayLabel()
             patient_info.setText('%s\t\n%s'%(patient_name,patient_birth))
-            patient_info.SetCharacterColor(Qt.white)
-            patient_info.SetBachgroundColor(225,109,9)
+            patient_info.setCharacterColor(Qt.white)
+            patient_info.setBackgroundColor(225,109,9)
 
             patient_info_widgetItem = QListWidgetItem()
+            patient_info_widgetItem.setSizeHint(QSize(40,60))
             self.listWidget.addItem(patient_info_widgetItem)
             self.listWidget.setItemWidget(patient_info_widgetItem,patient_info)
 
             thum = ThumbnailViewer()
-            thum.SetSeriesInfo(list(SequenceInfos.keys())[0])
+            thum.setSeriesInfo(list(SequenceInfos.keys())[0])
             thum_widgetItem = QListWidgetItem()
             self.listWidget.addItem(thum_widgetItem)
             self.listWidget.setItemWidget(thum_widgetItem, thum)
