@@ -17,7 +17,7 @@ import os
 class DicomToolWindow(QMainWindow):
     def __init__(self, parent=None):
         super(DicomToolWindow, self).__init__(parent)
-        Log.LogTrace('DicomViewerTool, Init')
+        Log.LogTrace('DicomToolWindow, Init')
         self.setWindowTitle("DicomTool")
         self.setStyleSheet("background-color:black")
         self.setAttribute(Qt.WA_TranslucentBackground)
@@ -33,12 +33,12 @@ class DicomToolWindow(QMainWindow):
         self.InitGUI()
 
     def InitModel(self):
-        LogTrace('DicomToolViewer, InitModel')
+        LogTrace('DicomToolWindow, InitModel')
         self.ImageNamesModel = ImageNamesModel()
         self.DicomToolController.SetModel(self.ImageNamesModel)
 
     def InitGUI(self):
-        LogTrace('DicomToolViewer, InitGUI')
+        LogTrace('DicomToolWindow, InitGUI')
         widget = QWidget()
         self.setCentralWidget(widget)
         self.layout = QHBoxLayout()
@@ -53,7 +53,7 @@ class DicomToolWindow(QMainWindow):
 
 
     def createActions(self):
-        Log.LogTrace('DicomViewerTool, createActions')
+        Log.LogTrace('DicomToolWindow, createActions')
         self.zoomAction = QAction(QIcon('Icons\\Zoom.png'), self.tr("Zoom"), self)
         self.zoomAction.setStatusTip(self.tr("Zoom"))
         self.zoomAction.setCheckable(True)
@@ -68,10 +68,10 @@ class DicomToolWindow(QMainWindow):
 
 
     def createMenus(self):
-        Log.LogTrace('DicomViewerTool, createMenus')
+        Log.LogTrace('DicomToolWindow, createMenus')
 
     def createToolBars(self):
-        Log.LogTrace('DicomViewerTool, createToolBars')
+        Log.LogTrace('DicomToolWindow, createToolBars')
         fileToolBar = self.addToolBar("Print")
         fileToolBar.setStyleSheet("background: rgb(150, 150, 150)")
         fileToolBar.setFixedHeight(50)
@@ -82,30 +82,30 @@ class DicomToolWindow(QMainWindow):
         fileToolBar.addSeparator()
 
     def dragEnterEvent(self, QEvent ):
-        Log.LogTrace('DicomViewerTool, dragEnterEvent')
+        Log.LogTrace('DicomToolWindow, dragEnterEvent')
         # print(QEvent)
         QEvent.acceptProposedAction()
         # QEvent.ignore()
 
 
     def dragLeaveEvent(self, QEvent):
-        Log.LogTrace('DicomViewerTool, dragLeaveEvent')
+        Log.LogTrace('DicomToolWindow, dragLeaveEvent')
         # QEvent.ignore()
 
 
     def dragMoveEvent(self, QEvent):
-        Log.LogTrace('DicomViewerTool, dragMoveEvent')
+        Log.LogTrace('DicomToolWindow, dragMoveEvent')
         # QEvent.ignore()
 
 
     def dragEvent(self, QEvent):
-        Log.LogTrace('DicomViewerTool, dragEvent')
+        Log.LogTrace('DicomToolWindow, dragEvent')
         # QEvent.ignore()
 
 
 
     def dropEvent(self, QEvent):
-        Log.LogTrace('DicomViewerTool, dropEvent')
+        Log.LogTrace('DicomToolWindow, dropEvent')
         urls = QEvent.mimeData().urls()
         folder = []
         for url in urls:
@@ -124,4 +124,4 @@ class DicomToolWindow(QMainWindow):
                 extension = os.path.splitext(file)
                 if len(extension[1]) == 0 or extension[1].lower() is '.dcm':
                     ImageNames.append(file)
-        self.ImageNamesModel.SetImageNames(ImageNames)
+        self.ImageNamesModel.setImageNames(ImageNames)

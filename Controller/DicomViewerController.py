@@ -75,7 +75,7 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
         super(DicomToolThumbnailController,self).__init__()
         self.Name = 'DicomToolThumbnailController'
         self.listWidgets = []
-        self.layout = QHBoxLayout()
+        self.layout = QVBoxLayout()
         self.SequenceModel = SequenceModel()
         self.SequenceInfoModel = SequenceInfoModel()
         self.DisplayModelsModel = DisplayModelsModel()
@@ -94,27 +94,36 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
     def updatePatient(self):
         LogTrace('DicomToolThumbnailController, updatePatient')
         SequenceInfos = self.SequenceInfoModel.GetSequenceInfo()
-
+        if len(SequenceInfos.keys()) == 2:
+            pass
+        if len(SequenceInfos.keys()) is len(self.listWidgets):
+            return
         patients = None
+        if len(self.listWidgets) is 0:
+            patients = list(SequenceInfos.keys())[0]
         for patientName in SequenceInfos.keys():
             for listWidget in self.listWidgets:
-                if patientName is not listWidget.getPatientName:
+                if patientName is not listWidget.getPatientName():
                     patients = patientName
 
-        if patients is None:
+        if patients is not None:
             listWidget = ThumbnailListWidget()
-            listWidget.setPatientName(patientName)
+            listWidget.setFocus()
+            listWidget.itemClicked.connect(self.ThumbnialItemClick)
+            listWidget.setPatientName(patients)
             listWidget.setContentsMargins(0, 0, 0, 0)
             # listWidget.verticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
             listWidget.horizontalOffset()
             # listWidget.horizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
             # listWidget.horizontalScrollBar().setDisabled(True)
             listWidget.setFixedWidth(ParaSetting.ThumbnailWidgetWidth)
-            listWidget.setStyleSheet("background-color: rgb(150, 150, 150)")
+            listWidget.setStyleSheet("background-color: rgb(%d, %d, %d)"%(ParaSetting.ThumbnailWidgetColorR,
+                                                                          ParaSetting.ThumbnailWidgetColorG,
+                                                                          ParaSetting.ThumbnailWidgetColorB))
             self.layout.addWidget(listWidget)
             self.listWidgets.append(listWidget)
-            dicomName = list(list(SequenceInfos[patientName].values())[0].values())[0]
 
+            dicomName = list(list(SequenceInfos[patients].values())[0].values())[0]
             reader = sitk.ImageFileReader()
             reader.SetFileName(dicomName)
             reader.LoadPrivateTagsOn()
@@ -125,11 +134,13 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
             patient_info = CharacterDisplayLabel()
             patient_info.setText('%s\t\n%s'%(patient_name,patient_birth))
             patient_info.setCharacterColor(Qt.white)
-            patient_info.setBackgroundColor(225,109,9)
+            patient_info.setBackgroundColor(ParaSetting.PatientNameDisplayColorR,
+                                            ParaSetting.PatientNameDisplayColorG,
+                                            ParaSetting.PatientNameDisplayColorB,255)
 
             patient_info_widgetItem = QListWidgetItem()
 
-            print(ParaSetting.ThumbnailPatientNameHeight, ParaSetting.ThumbnailWidgetWidth)
+            # print(ParaSetting.ThumbnailPatientNameHeight, ParaSetting.ThumbnailWidgetWidth)
             # patient_info_widgetItem.setSizeHint(QSize(150, 40))
             patient_info_widgetItem.setSizeHint(QSize(ParaSetting.ThumbnailWidgetWidth,ParaSetting.ThumbnailPatientNameHeight))
             # patient_info_widgetItem.setSizeHint(QSize(ParaSetting.ThumbnailPatientNameHeight,ParaSetting.ThumbnailWidgetWidth))
@@ -144,9 +155,8 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
             # listWidget.addItem(thum_widgetItem)
             # listWidget.setItemWidget(thum_widgetItem, thum)
 
-
     def SequenceInfoChange(self):
-        LogTrace('DicomToolThumbnailController, SequenceNamesChange')
+        LogTrace('DicomToolThumbnailController, SequenceInfoChange')
         SequenceInfos = self.SequenceInfoModel.GetSequenceInfo()
         self.updatePatient()
         for patientName in SequenceInfos.keys():
@@ -178,7 +188,6 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
                             listWidget.addItem(thum_widgetItem)
                             listWidget.setItemWidget(thum_widgetItem, thum)
 
-
     def SetModel(self, model):
         LogTrace('DicomToolThumbnailController, SetModel,'+model.Name)
         if model.Name is self.SequenceModel.Name:
@@ -191,10 +200,24 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
             self.DisplayModelsModel = model
             model.AddObserves(self)
 
-
     def SetLayout(self, layout):
         LogTrace('DicomToolThumbnailController, SetLayout')
         self.layout = layout
+
+    def ThumbnialItemClick(self, item):
+        LogTrace('DicomToolThumbnailController, ThumbnialItemClick')
+
+        listWidget = item.listWidget()
+        curwidget = listWidget.itemWidget(item)
+
+        if QApplication.keyboardModifiers() == Qt.ControlModifier:
+            curwidget.setSelectState( not curwidget.getSelectState() )
+        else:
+            for listwidget in self.listWidgets:
+                listwidget.setAllToNotSelected()
+            curwidget.setSelectState(True)
+
+
 
 class DicomToolPageController(Observe):
 
@@ -241,8 +264,8 @@ class DicomToolPageController(Observe):
     def SetLayout(self, layout):
         LogTrace('DicomToolMainController, SetLayout')
         self.layout = layout
-        thumbnailLayout = QHBoxLayout()
-        mainPanalLayout = QHBoxLayout()
+        thumbnailLayout = QVBoxLayout()
+        mainPanalLayout = QVBoxLayout()
 
         self.layout.addLayout(thumbnailLayout)
         self.layout.addStretch()
@@ -267,7 +290,7 @@ class DicomToolPageController(Observe):
 
     def ImageNamesChange(self):
         LogTrace('DicomToolMainController, ImageNamesChange')
-        ImageNames = self.ImageNamesModel.GetImageNames()
+        ImageNames = self.ImageNamesModel.getImageNames()
         N = len(ImageNames)
         reader = sitk.ImageFileReader()
         for i in range(N):
@@ -288,6 +311,7 @@ class DicomToolPageController(Observe):
             SequenceInfo[patient_name][name][int(instance_number)] = ImageNames[i]
 
             self.SequenceInfoModel.SetSequenceInfo(SequenceInfo)
+        pass
 
 if __name__ == '__main__':
 

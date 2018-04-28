@@ -11,13 +11,13 @@ class ImageNamesModel(BaseModel):
         self.Name = 'ImageNamesModel'
         self.names = []
 
-    def SetImageNames(self,names):
+    def setImageNames(self,names):
         Log.LogTrace('ImageNamesModel, SetImageNames')
         if names is not self.names:
             self.names = names
             self.Notify()
 
-    def GetImageNames(self):
+    def getImageNames(self):
         Log.LogTrace('ImageNamesModel, GetImageNames')
         return self.names
 

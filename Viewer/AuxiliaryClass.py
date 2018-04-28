@@ -4,6 +4,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from Controller.Log import LogTrace
 from Controller import ParaSetting
+from Viewer import DicomViewViewer
 
 class CharacterDisplayLabel(QLabel):
 
@@ -20,9 +21,9 @@ class CharacterDisplayLabel(QLabel):
         self.setFixedHeight(ParaSetting.ThumbnailPatientNameHeight)
         self.setFixedWidth(ParaSetting.ThumbnailWidgetWidth)
 
-    def setBackgroundColor(self, r,g,b):
+    def setBackgroundColor(self, r,g,b,a):
         LogTrace('CharacterDisplayLabel, setBackgroundColor')
-        self.setStyleSheet("background: rgb(%d,%d,%d)"%(r,g,b))
+        self.setStyleSheet("background: rgb(%d,%d,%d,%d)"%(r,g,b,a))
 
     def setCharacterColor(self, color):
         LogTrace('CharacterDisplayLabel, setCharacterColor')
@@ -48,3 +49,13 @@ class ThumbnailListWidget(QListWidget):
     def getPatientName(self):
         LogTrace('ThumbnailListWidget, getPatientName')
         return self.patientName
+
+    def setAllToNotSelected(self):
+        LogTrace('ThumbnailListWidget, setAllToNotSelected')
+        N = self.count()
+        for i in range(N):
+            widgetItem = self.item(i)
+            widget = self.itemWidget(widgetItem)
+            if isinstance(widget,
+                          DicomViewViewer.ThumbnailViewer):
+                widget.setSelectState(False)
