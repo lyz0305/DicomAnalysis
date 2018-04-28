@@ -1,37 +1,29 @@
 
-
-import SimpleITK as sitk
-
-import pydicom as dicom
-import numpy as np
 import time
+import sys
 
-name = "G:\\SNAP_Signal_Analysis\\snap_simulation\\SNAP_TOF_Data\\Chang Cheng\\TOF\\IM_0180"
-# pydicom
-# T = time.localtime(time.time())
-# print(T)
-# for i in range(800):
-#     Tag = ['PatientID','ImageType']
-#     # ds = dicom.read_file("G:\\SNAP_Signal_Analysis\\snap_simulation\\SNAP_TOF_Data\\Chang Cheng\\TOF\\IM_0180",stop_before_pixels=True)
-#     dicom.dcmread(name,specific_tags=Tag)
-#     # image = np.array(ds.pixel_array)
-#     # dicom.read_dicomdir()
-# T = time.localtime(time.time())
-# print(T)
+def LogClassFuncInfos(func):
 
+    def wrapper(*s, **gs):
+        methodName = format(func.__name__)
+        print(methodName)
+        print('start')
+        ret = func(*s, **gs)
+        print('end')
+        return ret
 
-# simple itk
+    return wrapper
 
-T = time.localtime(time.time())
-print(T)
-reader = sitk.ImageFileReader()
-for i in range(800):
-    reader.SetFileName(name)
-    reader.LoadPrivateTagsOn()
-    reader.ReadImageInformation()
-    keys = reader.GetMetaDataKeys()
+class NameModel():
 
-T = time.localtime(time.time())
-print(T)
+    def __init__(self):
+        self.name = 'test'
 
-import nibabel
+    @LogClassFuncInfos
+    def getName(self):
+        print('run function')
+        return self.name
+
+a = NameModel()
+print(a.getName())
+

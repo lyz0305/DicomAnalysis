@@ -8,13 +8,15 @@ from scipy.misc import imresize
 import qimage2ndarray
 import Viewer.EventDecision as Event
 import Controller.Log as Log
+from Controller import Log
 import Controller.ParaSetting as Setting
 
 
 class DicomBasicContrastViewer(QLabel):
+
+    @Log.LogClassFuncInfos
     def __init__(self,parent=None):
         super(DicomBasicContrastViewer,self).__init__(parent)
-        Log.LogTrace('DicomBasicContrastViewer, Init')
         self.setStyleSheet("background-color:black")
         self.setMouseTracking(True)
         self.ContrastAble = True
@@ -30,36 +32,36 @@ class DicomBasicContrastViewer(QLabel):
         self.contrast['center'] = -9999
         self.contrast['width'] = -9999
 
+    @Log.LogClassFuncInfos
     def SetContrastAble(self, able):
-        Log.LogTrace('DicomBasicContrastViewer, SetContrastAble')
         self.ContrastAble = able
 
+    @Log.LogClassFuncInfos
     def setContrast(self,center,width):
-        Log.LogTrace('DicomBasicContrastViewer, setContrast')
         self.contrast['center'] = center
         self.contrast['width'] = width
         self.updateViewer()
 
+    @Log.LogClassFuncInfos
     def setImage(self,image):
-        Log.LogTrace('DicomBasicContrastViewer, setImage')
         self.originalImg = image
         self.updateImgSize()
         self.resetcontrast()
 
+    @Log.LogClassFuncInfos
     def resetcontrast(self):
-        Log.LogTrace('DicomBasicContrastViewer, resetcontrast')
         MIN = self.displayImg.min()
         MAX = self.displayImg.max()
         center = (MIN + MAX) / 2
         width = (MAX - MIN)
         self.setContrast(center=center, width=width)
 
+    @Log.LogClassFuncInfos
     def resizeEvent(self, event):
-        Log.LogTrace('DicomBasicContrastViewer, resizeEvent')
         self.updateImgSize()
 
+    @Log.LogClassFuncInfos
     def updateImgSize(self):
-        Log.LogTrace('DicomBasicContrastViewer, updateImgSize')
         if self.originalImg is None:
             return
         size = [self.height(), self.width()]
@@ -67,10 +69,8 @@ class DicomBasicContrastViewer(QLabel):
         self.displayImg = zoomImg
         self.updateViewer()
 
-
-
+    @Log.LogClassFuncInfos
     def updateViewer(self):
-        Log.LogTrace('DicomBasicContrastViewer, updateViewer')
         if self.displayImg is None:
             return
         MIN = (2*self.contrast['center'] - self.contrast['width'])/2.0 + 0.5
@@ -83,24 +83,23 @@ class DicomBasicContrastViewer(QLabel):
         QImg = qimage2ndarray.gray2qimage(disImg)
         self.setPixmap(QPixmap.fromImage(QImg))
 
+    @Log.LogClassFuncInfos
     def mousePressEvent(self, QMouseEvent):
-        Log.LogTrace('DicomBasicContrastViewer, mousePressEvent')
         scenePos = QMouseEvent.pos()
         self.pressPoint = [scenePos.x(), scenePos.y()]
         self.oldPoint = [scenePos.x(), scenePos.y()]
-
         QMouseEvent.ignore()
 
+    @Log.LogClassFuncInfos
     def mouseReleaseEvent(self, QMouseEvent):
-        Log.LogTrace('DicomBasicContrastViewer, mouseReleaseEvent')
         pos = QMouseEvent.pos()
         self.releasePoint = [pos.x(), pos.y()]
         self.pressPoint = [-1,-1]
 
         QMouseEvent.ignore()
 
+    @Log.LogClassFuncInfos
     def mouseMoveEvent(self, QMouseEvent):
-        Log.LogTrace('DicomBasicContrastViewer, mouseMoveEvent')
         pos = QMouseEvent.pos()
         self.currentPoint = [pos.x(), pos.y()]
         if self.pressPoint[0] is not -1 and self.pressPoint[1] is not -1:
@@ -109,9 +108,6 @@ class DicomBasicContrastViewer(QLabel):
                 dy = self.currentPoint[1] - self.oldPoint[1]
                 self.setContrast(center=self.contrast['center'] + dx*Setting.contrastRatio,
                                  width=self.contrast['width'] + dy*Setting.contrastRatio)
-
-
-
 
 
         self.oldPoint = [pos.x(), pos.y()]

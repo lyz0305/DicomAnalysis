@@ -5,84 +5,89 @@ import Controller.Log as Log
 
 class ImageNamesModel(BaseModel):
 
+    @Log.LogClassFuncInfos
     def __init__(self):
-        Log.LogTrace('ImageNamesModel, Init')
         super(ImageNamesModel, self).__init__()
         self.Name = 'ImageNamesModel'
         self.names = []
 
+    @Log.LogClassFuncInfos
     def setImageNames(self,names):
-        Log.LogTrace('ImageNamesModel, SetImageNames')
         if names is not self.names:
             self.names = names
             self.Notify()
 
+    @Log.LogClassFuncInfos
     def getImageNames(self):
-        Log.LogTrace('ImageNamesModel, GetImageNames')
         return self.names
 
 class SequenceModel(BaseModel):
+
+    @Log.LogClassFuncInfos
     def __init__(self):
-        Log.LogTrace('SequenceModel, Init')
         super(SequenceModel,self).__init__()
         self.Name = 'SequenceModel'
         self.Sequence = dict()
 
+    @Log.LogClassFuncInfos
     def SetSequence(self, Sequence):
-        Log.LogTrace('SequenceModel, SetSequence')
         if Sequence is not self.Sequence:
             self.Sequence = Sequence
             self.Notify()
+
+    @Log.LogClassFuncInfos
     def GetSequence(self):
-        Log.LogTrace('SequenceModel, GetSequence')
         return self.SequenceList
 
 class SequenceInfoModel(BaseModel):
+
+    @Log.LogClassFuncInfos
     def __init__(self):
-        Log.LogTrace('SequenceInfoModel, Init')
         super(SequenceInfoModel,self).__init__()
         self.Name = 'SequenceInfoModel'
         self.SequenceInfo = dict()
 
+    @Log.LogClassFuncInfos
     def SetSequenceInfo(self,Info):
-        Log.LogTrace('SequenceInfoModel,SetSequenceInfo')
         if Info is not self.SequenceInfo:
             self.SequenceInfo = Info
             self.Notify()
 
+    @Log.LogClassFuncInfos
     def GetSequenceInfo(self):
-        Log.LogTrace('SequenceInfoModel,GetSequenceInfo')
         return self.SequenceInfo.copy()
 
 class DisplayImageModel(BaseModel):
+
+    @Log.LogClassFuncInfos
     def __init__(self):
-        Log.LogTrace('DisplayImageModel, Init')
         super(DisplayImageModel, self).__init__()
         self.Name = 'DisplayImageModel'
         self.Img = None
 
+    @Log.LogClassFuncInfos
     def setImage(self, image):
-        Log.LogTrace('DisplayImageModel, setImage')
         if image is not self.Img:
             self.Img = image
             self.Notify()
 
+    @Log.LogClassFuncInfos
     def getImage(self):
-        Log.LogTrace('DisplayImageModel, getImage')
         return self.Img
 
 
 class DisplayInfoModel(BaseModel):
+
+    @Log.LogClassFuncInfos
     def __init__(self):
-        Log.LogTrace('DisplayInfoModel, Init')
         super(DisplayInfoModel,self).__init__()
         self.Name = 'DisplayInfoModel'
         self.patientName = None
         self.seriesName = None
         self.instanceNumber = None
 
+    @Log.LogClassFuncInfos
     def setDisplayInfo(self, patientName, seriesName, instanceNumber):
-        Log.LogTrace('DisplayInfoModel, setDisplayInfo')
         if patientName is not self.patientName or seriesName is not self.seriesName\
                 or instanceNumber is not self.instanceNumber:
             self.patientName = patientName
@@ -90,34 +95,34 @@ class DisplayInfoModel(BaseModel):
             self.instanceNumber = instanceNumber
             self.Notify()
 
+    @Log.LogClassFuncInfos
     def getPatientName(self):
-        LogTrace('DisplayInfoModel, getPatientName')
         return self.patientName
 
+    @Log.LogClassFuncInfos
     def getSeriesName(self):
-        LogTrace('DisplayIDModel, getSeriesName')
         return self.seriesName
 
+    @Log.LogClassFuncInfos
     def getInstanceNumber(self):
-        LogTrace('DisplayIDModel, getInstanceNumber')
         return self.instanceNumber
 
 class DisplayModelsModel(BaseModel):
 
+    @Log.LogClassFuncInfos
     def __init__(self):
-        Log.LogTrace('DisplayModelModel, Init')
         super(DisplayModelsModel, self).__init__()
         self.Name = 'DisplayModelModel'
         self.DisplayModels = []
 
+    @Log.LogClassFuncInfos
     def setDisplayModels(self, models):
-        Log.LogTrace('DisplayModelModel, setDisplayModels')
         if models is not self.DisplayModels:
             self.DisplayModels = models
             self.Notify()
 
+    @Log.LogClassFuncInfos
     def getDisplayModels(self):
-        Log.LogTrace('DisplayModelModel, getDisplayModels')
         return self.DisplayModels
 
 if __name__=='__main__':

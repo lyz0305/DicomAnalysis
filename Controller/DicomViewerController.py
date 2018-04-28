@@ -1,6 +1,5 @@
 
 from Controller.Observe import *
-from Controller.Log import *
 from Controller.DicomViewerBaseController import *
 from Model.DicomViewerModel import *
 import SimpleITK as sitk
@@ -11,67 +10,74 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from Controller import ParaSetting
+from Controller import Log
 
 
 class DicomToolViewController(DicomViewerBasePanelController, Observe):
 
+    @Log.LogClassFuncInfos
     def __init__(self):
-        LogTrace('DicomToolViewController, Init')
         self.Name = 'DicomToolViewController'
         super(DicomToolViewController, self).__init__()
         self.layout = QHBoxLayout()
 
+    @Log.LogClassFuncInfos
     def InitGUI(self):
-        LogTrace('DicomToolViewController, InitGUI')
+        pass
 
+    @Log.LogClassFuncInfos
     def InitModel(self):
-        LogTrace('DicomToolViewController, InitModel')
+        pass
 
+    @Log.LogClassFuncInfos
     def Update(self,model):
-        LogTrace('DicomToolViewController, Update')
+        pass
 
+    @Log.LogClassFuncInfos
     def SetModel(self, model):
-        LogTrace('DicomToolViewController, SetModel,'+model.Name)
+        pass
 
+    @Log.LogClassFuncInfos
     def SetLayout(self, layout):
-        LogTrace('DicomToolViewController, SetLayout')
+        pass
         self.layout = layout
 
 class DicomToolMainPanelController(DicomViewerBasePanelController, Observe):
 
+    @Log.LogClassFuncInfos
     def __init__(self):
-        LogTrace('DicomToolMainPanelController, Init')
         self.Name = 'DicomToolMainPanelController'
         super(DicomToolMainPanelController,self).__init__()
         self.layout = QHBoxLayout()
         self.DisplayModelsModel = None
 
+    @Log.LogClassFuncInfos
     def InitGUI(self):
-        LogTrace('DicomToolMainPanelController, InitGUI')
+        pass
 
+    @Log.LogClassFuncInfos
     def InitModel(self):
-        LogTrace('DicomToolMainPanelController, InitModel')
         self.DisplayModelsModel = DisplayModelsModel()
 
-
+    @Log.LogClassFuncInfos
     def Update(self,model):
-        LogTrace('DicomToolMainPanelController, Update')
+        pass
 
+    @Log.LogClassFuncInfos
     def SetModel(self, model):
-        LogTrace('DicomToolMainPanelController, SetModel,'+model.Name)
         if model.Name == self.DisplayModelsModel.Name:
             self.DisplayModelsModel.Name = model
             self.DisplayModelsModel.AddObserves(self)
 
-
+    @Log.LogClassFuncInfos
     def SetLayout(self, layout):
-        LogTrace('DicomToolMainPanelController, SetLayout')
         self.layout = layout
 
 
 class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
+
+    @Log.LogClassFuncInfos
     def __init__(self):
-        LogTrace('DicomToolThumbnailController, Init')
         super(DicomToolThumbnailController,self).__init__()
         self.Name = 'DicomToolThumbnailController'
         self.listWidgets = []
@@ -80,19 +86,21 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
         self.SequenceInfoModel = SequenceInfoModel()
         self.DisplayModelsModel = DisplayModelsModel()
 
+    @Log.LogClassFuncInfos
     def InitGUI(self):
-        LogTrace('DicomToolThumbnailController, InitGUI')
+        pass
 
+    @Log.LogClassFuncInfos
     def InitModel(self):
-        LogTrace('DicomToolThumbnailController, InitModel')
+        pass
 
+    @Log.LogClassFuncInfos
     def Update(self,model):
-        LogTrace('DicomToolThumbnailController, InitModel')
         if model.Name == self.SequenceInfoModel.Name:
             self.SequenceInfoChange()
 
+    @Log.LogClassFuncInfos
     def updatePatient(self):
-        LogTrace('DicomToolThumbnailController, updatePatient')
         SequenceInfos = self.SequenceInfoModel.GetSequenceInfo()
         if len(SequenceInfos.keys()) == 2:
             pass
@@ -155,8 +163,8 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
             # listWidget.addItem(thum_widgetItem)
             # listWidget.setItemWidget(thum_widgetItem, thum)
 
+    @Log.LogClassFuncInfos
     def SequenceInfoChange(self):
-        LogTrace('DicomToolThumbnailController, SequenceInfoChange')
         SequenceInfos = self.SequenceInfoModel.GetSequenceInfo()
         self.updatePatient()
         for patientName in SequenceInfos.keys():
@@ -188,8 +196,8 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
                             listWidget.addItem(thum_widgetItem)
                             listWidget.setItemWidget(thum_widgetItem, thum)
 
+    @Log.LogClassFuncInfos
     def SetModel(self, model):
-        LogTrace('DicomToolThumbnailController, SetModel,'+model.Name)
         if model.Name is self.SequenceModel.Name:
             self.SequenceModel = model
             model.AddObserves(self)
@@ -200,12 +208,12 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
             self.DisplayModelsModel = model
             model.AddObserves(self)
 
+    @Log.LogClassFuncInfos
     def SetLayout(self, layout):
-        LogTrace('DicomToolThumbnailController, SetLayout')
         self.layout = layout
 
+    @Log.LogClassFuncInfos
     def ThumbnialItemClick(self, item):
-        LogTrace('DicomToolThumbnailController, ThumbnialItemClick')
 
         listWidget = item.listWidget()
         curwidget = listWidget.itemWidget(item)
@@ -218,21 +226,18 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
             curwidget.setSelectState(True)
 
 
-
 class DicomToolPageController(Observe):
 
+    @Log.LogClassFuncInfos
     def __init__(self):
-        LogTrace('DicomToolMainController, Init')
         super(DicomToolPageController,self).__init__()
         self.Name = 'DicomToolPageController'
         self.MainPanelController = DicomToolMainPanelController()
         self.ThumbnailControlelr = DicomToolThumbnailController()
         self.InitModel()
 
+    @Log.LogClassFuncInfos
     def InitModel(self):
-        LogTrace('DicomToolMainController, InitModel')
-
-
         self.ImageNamesModel = ImageNamesModel()
         self.SequenceModel = SequenceModel()
         self.SequenceInfoModel = SequenceInfoModel()
@@ -246,13 +251,13 @@ class DicomToolPageController(Observe):
         self.ThumbnailControlelr.InitModel()
         self.SetModelDown()
 
+    @Log.LogClassFuncInfos
     def InitGUI(self):
-        LogTrace('DicomToolMainController, InitGUI')
         self.MainPanelController.InitGUI()
         self.ThumbnailControlelr.InitGUI()
 
+    @Log.LogClassFuncInfos
     def SetModelDown(self):
-        LogTrace('DicomToolMainController, SetModelDown')
         self.MainPanelController.SetModel(self.ImageNamesModel)
         self.ThumbnailControlelr.SetModel(self.ImageNamesModel)
         self.MainPanelController.SetModel(self.SequenceModel)
@@ -261,8 +266,8 @@ class DicomToolPageController(Observe):
         self.MainPanelController.SetModel(self.DisplayModelsModel)
         self.ThumbnailControlelr.SetModel(self.DisplayModelsModel)
 
+    @Log.LogClassFuncInfos
     def SetLayout(self, layout):
-        LogTrace('DicomToolMainController, SetLayout')
         self.layout = layout
         thumbnailLayout = QVBoxLayout()
         mainPanalLayout = QVBoxLayout()
@@ -273,9 +278,8 @@ class DicomToolPageController(Observe):
         self.MainPanelController.SetLayout(mainPanalLayout)
         self.ThumbnailControlelr.SetLayout(thumbnailLayout)
 
-
+    @Log.LogClassFuncInfos
     def SetModel(self, model):
-        LogTrace('DicomToolMainController, SetModel,'+model.Name)
         if model.Name == 'ImageNamesModel':
             self.ImageNamesModel = model
             self.ImageNamesModel.AddObserves(self)
@@ -283,14 +287,17 @@ class DicomToolPageController(Observe):
 
         self.SetModelDown()
 
+    @Log.LogClassFuncInfos
     def Update(self,model):
-        LogTrace('DicomToolMainController, Update,'+model.Name)
         if model.Name == self.ImageNamesModel.Name:
             self.ImageNamesChange()
 
+    @Log.LogClassFuncInfos
     def ImageNamesChange(self):
-        LogTrace('DicomToolMainController, ImageNamesChange')
         ImageNames = self.ImageNamesModel.getImageNames()
+        if ImageNames is None:
+            return
+
         N = len(ImageNames)
         reader = sitk.ImageFileReader()
         for i in range(N):

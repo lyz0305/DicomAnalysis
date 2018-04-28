@@ -1,27 +1,27 @@
 
-from Controller.Log import *
+from Controller import Log
 import sys
 
 class DicomViewerBasePanelController:
 
+    @Log.LogClassFuncInfos
     def __init__(self):
-        LogTrace('DicomToolBaseController, Init')
         self.Name = 'DicomToolBasePanelController'
         self.InitGUI()
         self.InitModel()
 
+    @Log.LogClassFuncInfos
     def InitModel(self):
-        LogTrace('DicomToolBaseController, InitModel')
         sys.exit('Controller must rewrite the InitModel function')
 
+    @Log.LogClassFuncInfos
     def InitGUI(self):
-        LogTrace('DicomToolBaseController, InitGUI')
         sys.exit('Controller must rewrite the InitGUI function')
 
+    @Log.LogClassFuncInfos
     def SetModel(self, model):
-        LogTrace('DicomToolBaseController, SetModel')
         sys.exit('Controller must rewrite the SetModel function')
 
+    @Log.LogClassFuncInfos
     def Update(self, model):
-        LogTrace('DicomToolBaseController, Update')
         sys.exit('Controller must rewrite the Update function')

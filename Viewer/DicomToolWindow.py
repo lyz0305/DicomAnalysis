@@ -6,18 +6,18 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
-import Controller.Log as Log
 from Controller.DicomViewerController import *
 from Model.DicomViewerModel import *
 import os
-
+from Controller import Log
 
 
 
 class DicomToolWindow(QMainWindow):
+
+    @Log.LogClassFuncInfos
     def __init__(self, parent=None):
         super(DicomToolWindow, self).__init__(parent)
-        Log.LogTrace('DicomToolWindow, Init')
         self.setWindowTitle("DicomTool")
         self.setStyleSheet("background-color:black")
         self.setAttribute(Qt.WA_TranslucentBackground)
@@ -32,13 +32,13 @@ class DicomToolWindow(QMainWindow):
         self.InitModel()
         self.InitGUI()
 
+    @Log.LogClassFuncInfos
     def InitModel(self):
-        LogTrace('DicomToolWindow, InitModel')
         self.ImageNamesModel = ImageNamesModel()
         self.DicomToolController.SetModel(self.ImageNamesModel)
 
+    @Log.LogClassFuncInfos
     def InitGUI(self):
-        LogTrace('DicomToolWindow, InitGUI')
         widget = QWidget()
         self.setCentralWidget(widget)
         self.layout = QHBoxLayout()
@@ -46,14 +46,13 @@ class DicomToolWindow(QMainWindow):
         widget.setLayout(self.layout)
         self.DicomToolController.SetLayout(self.layout)
 
-
+    @Log.LogClassFuncInfos
     def createPanel(self):
 
         pass
 
-
+    @Log.LogClassFuncInfos
     def createActions(self):
-        Log.LogTrace('DicomToolWindow, createActions')
         self.zoomAction = QAction(QIcon('Icons\\Zoom.png'), self.tr("Zoom"), self)
         self.zoomAction.setStatusTip(self.tr("Zoom"))
         self.zoomAction.setCheckable(True)
@@ -66,12 +65,12 @@ class DicomToolWindow(QMainWindow):
         self.contrastAction.setStatusTip(self.tr("Contrast"))
         self.contrastAction.setCheckable(True)
 
-
+    @Log.LogClassFuncInfos
     def createMenus(self):
-        Log.LogTrace('DicomToolWindow, createMenus')
+        pass
 
+    @Log.LogClassFuncInfos
     def createToolBars(self):
-        Log.LogTrace('DicomToolWindow, createToolBars')
         fileToolBar = self.addToolBar("Print")
         fileToolBar.setStyleSheet("background: rgb(150, 150, 150)")
         fileToolBar.setFixedHeight(50)
@@ -81,31 +80,29 @@ class DicomToolWindow(QMainWindow):
         fileToolBar.addAction(self.zoomAction)
         fileToolBar.addSeparator()
 
+    @Log.LogClassFuncInfos
     def dragEnterEvent(self, QEvent ):
-        Log.LogTrace('DicomToolWindow, dragEnterEvent')
         # print(QEvent)
         QEvent.acceptProposedAction()
         # QEvent.ignore()
 
-
+    @Log.LogClassFuncInfos
     def dragLeaveEvent(self, QEvent):
-        Log.LogTrace('DicomToolWindow, dragLeaveEvent')
+        pass
         # QEvent.ignore()
 
-
+    @Log.LogClassFuncInfos
     def dragMoveEvent(self, QEvent):
-        Log.LogTrace('DicomToolWindow, dragMoveEvent')
+        pass
         # QEvent.ignore()
 
-
+    @Log.LogClassFuncInfos
     def dragEvent(self, QEvent):
-        Log.LogTrace('DicomToolWindow, dragEvent')
+        pass
         # QEvent.ignore()
 
-
-
+    @Log.LogClassFuncInfos
     def dropEvent(self, QEvent):
-        Log.LogTrace('DicomToolWindow, dropEvent')
         urls = QEvent.mimeData().urls()
         folder = []
         for url in urls:

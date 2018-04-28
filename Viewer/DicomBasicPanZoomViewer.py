@@ -8,15 +8,16 @@ from scipy.misc import imresize
 import qimage2ndarray
 from Viewer.DicomBasicContrastViewer import *
 import Controller.Log as Log
+from Controller import Log
 import Viewer.EventDecision as Event
 import Controller.ParaSetting as Setting
 
 
 class DicomBasicPanZoomViewer(QLabel):
 
+    @Log.LogClassFuncInfos
     def __init__(self,parent=None):
         super(DicomBasicPanZoomViewer,self).__init__(parent)
-        Log.LogTrace('DicomBasicPanZoomViewer, Init')
         self.PanAble = True
         self.ZoomAble = True
         self.ContrastAble = True
@@ -39,31 +40,29 @@ class DicomBasicPanZoomViewer(QLabel):
         self.currentPoint = [-1, -1]
         self.oldPoint = [-1, -1]
 
+    @Log.LogClassFuncInfos
     def contrastLabelPan(self,x,y):
-        Log.LogTrace('DicomBasicPanZoomViewer, contrastLabelPan')
         geo = self.contrastlabel.geometry()
         self.contrastlabel.setGeometry(geo.x()+x,geo.y()+y,geo.width(),geo.height())
 
-
+    @Log.LogClassFuncInfos
     def contraslLabelZoom(self,x,y):
-        Log.LogTrace('DicomBasicPanZoomViewer, contraslLabelZoom')
         r = min([x,y])
         geo = self.contrastlabel.geometry()
         height = geo.height() + r*Setting.zoomRatio
         width = geo.width() + r*Setting.zoomRatio
 
-
         x = geo.x()+geo.width()/2 - width/2
         y = geo.y()+geo.height()/2 - height/2
         self.contrastlabel.setGeometry(x,y,width,height)
 
+    @Log.LogClassFuncInfos
     def setImage(self,image):
         '''
 
         :param image: the input image, a numpy type
         :return:
         '''
-        Log.LogTrace('DicomBasicPanZoomViewer, setImage')
         self.originalImg = image
         self.contrastlabel.setImage(image)
         width,height = image.shape
@@ -74,53 +73,46 @@ class DicomBasicPanZoomViewer(QLabel):
 
         self.resizeEvent([])
 
+    @Log.LogClassFuncInfos
     def resizeEvent(self, event):
-        Log.LogTrace('DicomBasicPanZoomViewer, resizeEvent')
 
         self.updateViewer()
 
+    @Log.LogClassFuncInfos
     def updateViewer(self):
-        Log.LogTrace('DicomBasicPanZoomViewer, updateViewer')
-
         self.contrastlabel.updateViewer()
 
-
+    @Log.LogClassFuncInfos
     def mousePressEvent(self, QMouseEvent):
-        Log.LogTrace('DicomBasicPanZoomViewer, mousePressEvent')
         scenePos = QMouseEvent.pos()
         self.pressPoint = [scenePos.x(), scenePos.y()]
-
-
         QMouseEvent.ignore()
 
-
+    @Log.LogClassFuncInfos
     def mouseReleaseEvent(self, QMouseEvent):
-        Log.LogTrace('DicomBasicPanZoomViewer, mouseReleaseEvent')
         pos = QMouseEvent.pos()
         self.releasePoint = [pos.x(),pos.y()]
         QMouseEvent.ignore()
-        pass
 
+    @Log.LogClassFuncInfos
     def mouseDoubleClickEvent(self, QMouseEvent):
-        Log.LogTrace('DicomBasicPanZoomViewer, mouseDoubleClickEvent')
         QMouseEvent.ignore()
-        pass
 
+    @Log.LogClassFuncInfos
     def SetPanAble(self, able):
-        Log.LogTrace('DicomBasicPanZoomViewer, SetPanAble')
         self.PanAble = able
 
+    @Log.LogClassFuncInfos
     def SetZoomAble(self, able):
-        Log.LogTrace('DicomBasicPanZoomViewer, SetZoomAble')
         self.ZoomAble = able
 
+    @Log.LogClassFuncInfos
     def SetContrastAble(self, able):
-        Log.LogTrace('DicomBasicPanZoomViewer, SetContrastAble')
         self.ContrastAble = able
         self.contrastlabel.SetContrastAble(able)
 
+    @Log.LogClassFuncInfos
     def mouseMoveEvent(self, QMouseEvent):
-        Log.LogTrace('DicomBasicPanZoomViewer, mouseMoveEvent')
         pos = QMouseEvent.pos()
         self.currentPoint = [pos.x(),pos.y()]
 

@@ -3,15 +3,16 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
-import Controller.Log as Log
+
+from Controller import Log
 from Viewer.DicomBasicPanZoomViewer import *
 from Viewer.AuxiliaryClass import CharacterDisplayLabel
 from Controller import ParaSetting
 
 class ThumbnailViewer(QLabel):
 
+    @Log.LogClassFuncInfos
     def __init__(self):
-        Log.LogTrace('ThumbnailViewer, Init')
         super(ThumbnailViewer,self).__init__()
         self.seriesName = None
         self.selected = False
@@ -31,25 +32,25 @@ class ThumbnailViewer(QLabel):
         self.layout.addWidget(self.name_label)
         self.layout.addWidget(self.thumbnail_image)
 
+    @Log.LogClassFuncInfos
     def setSeriesName(self, str):
-        Log.LogTrace('ThumbnailViewer, SetSeriesInfo')
         self.name_label.setText(str)
         self.seriesName = str
 
+    @Log.LogClassFuncInfos
     def getSeriesName(self):
-        Log.LogTrace('ThumbnailViewer, getSeriesName')
         return self.seriesName
 
+    @Log.LogClassFuncInfos
     def setImage(self, image):
-        Log.LogTrace('ThumbnailViewer, SetImage')
         self.thumbnail_image.setImage(image)
 
+    @Log.LogClassFuncInfos
     def setCharacterBackground(self, r, g, b, a):
-        Log.LogTrace('ThumbnailViewer, setCharacterBackground')
         self.name_label.setBackgroundColor(r,g,b,a)
 
+    @Log.LogClassFuncInfos
     def setSelectState(self, state):
-        Log.LogTrace('ThumbnailViewer, setSelectState')
         self.selected = state
         if self.selected is True:
             self.setCharacterBackground(ParaSetting.ThumbnailSelectedColorR,
@@ -62,6 +63,6 @@ class ThumbnailViewer(QLabel):
                                         ParaSetting.ThumbnailSelectedColorB,
                                         0)
 
+    @Log.LogClassFuncInfos
     def getSelectState(self):
-        Log.LogTrace('ThumbnailViewer, getSelectState')
         return self.selected

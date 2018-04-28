@@ -4,10 +4,10 @@ import sys
 
 class Observe:
 
+    @Log.LogClassFuncInfos
     def __init__(self):
+        pass
 
-        Log.LogTrace('Observe, Init')
-
+    @Log.LogClassFuncInfos
     def Update(self,model):
-        Log.LogTrace('Observe, model')
         sys.exit('Controller must rewrite the Update function')
