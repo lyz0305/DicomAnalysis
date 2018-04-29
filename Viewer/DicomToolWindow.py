@@ -35,20 +35,19 @@ class DicomToolWindow(QMainWindow):
     @Log.LogClassFuncInfos
     def InitModel(self):
         self.ImageNamesModel = ImageNamesModel()
-        self.DicomToolController.SetModel(self.ImageNamesModel)
+        self.DicomToolController.setModel(self.ImageNamesModel)
 
     @Log.LogClassFuncInfos
     def InitGUI(self):
         widget = QWidget()
         self.setCentralWidget(widget)
-        self.layout = QHBoxLayout()
+        self.layout = QVBoxLayout()
         self.layout.setContentsMargins(0,0,0,0)
         widget.setLayout(self.layout)
-        self.DicomToolController.SetLayout(self.layout)
+        self.DicomToolController.setLayout(self.layout)
 
     @Log.LogClassFuncInfos
     def createPanel(self):
-
         pass
 
     @Log.LogClassFuncInfos

@@ -63,19 +63,28 @@ class DicomBasicPanZoomViewer(QLabel):
         :param image: the input image, a numpy type
         :return:
         '''
-        self.originalImg = image
+        self.__originalImg = image
         self.__contrastlabel.setImage(image)
-        width,height = image.shape
+        # width,height = image.shape
+        # self.__contrastlabel.resize(width,height)
+        # x = self.width()/2 - width/2
+        # y = self.height()/2 - height/2
+
+    @Log.LogClassFuncInfos
+    def resetGeometryByImg(self):
+        width, height = self.__originalImg.shape
         self.__contrastlabel.resize(width,height)
         x = self.width()/2 - width/2
         y = self.height()/2 - height/2
         self.__contrastlabel.setGeometry(x,y,width,height)
-
-        self.resizeEvent([])
+        pass
+        # self.resizeEvent([])
 
     @Log.LogClassFuncInfos
     def resizeEvent(self, event):
-
+        print(self.height(), self.width())
+        # self.__contrastlabel.resize(200,50)
+        self.__contrastlabel.resize(self.width(), self.height())
         self.updateViewer()
 
     @Log.LogClassFuncInfos
@@ -99,15 +108,15 @@ class DicomBasicPanZoomViewer(QLabel):
         QMouseEvent.ignore()
 
     @Log.LogClassFuncInfos
-    def SetPanAble(self, able):
+    def setPanAble(self, able):
         self.__panAble = able
 
     @Log.LogClassFuncInfos
-    def SetZoomAble(self, able):
+    def setZoomAble(self, able):
         self.__zoomAble = able
 
     @Log.LogClassFuncInfos
-    def SetContrastAble(self, able):
+    def setContrastAble(self, able):
         self.__contrastAble = able
         self.__contrastlabel.SetContrastAble(able)
 

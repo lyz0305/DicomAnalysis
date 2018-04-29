@@ -26,8 +26,9 @@ class ThumbnailViewer(QLabel):
         self.name_label.setFixedHeight(ParaSetting.ThumbnailSeryNameHeight)
         self.name_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.thumbnail_image = DicomBasicPanZoomViewer()
-        self.thumbnail_image.SetPanAble(False)
-        self.thumbnail_image.SetZoomAble(False)
+        self.thumbnail_image.setPanAble(False)
+        self.thumbnail_image.setZoomAble(False)
+        self.thumbnail_image.setContrastAble(False)
 
         self.layout.addWidget(self.name_label)
         self.layout.addWidget(self.thumbnail_image)

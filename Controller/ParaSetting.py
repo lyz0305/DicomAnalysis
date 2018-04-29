@@ -21,3 +21,7 @@ ThumbnailSelectedColorR = 200
 ThumbnailSelectedColorG = 200
 ThumbnailSelectedColorB = 200
 
+StatusColorR = 100
+StatusColorG = 100
+StatusColorB = 100
+

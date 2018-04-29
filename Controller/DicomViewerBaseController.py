@@ -7,21 +7,21 @@ class DicomViewerBasePanelController:
     @Log.LogClassFuncInfos
     def __init__(self):
         self.Name = 'DicomToolBasePanelController'
-        self.InitGUI()
-        self.InitModel()
+        self.initGUI()
+        self.initModel()
 
     @Log.LogClassFuncInfos
-    def InitModel(self):
+    def initModel(self):
         sys.exit('Controller must rewrite the InitModel function')
 
     @Log.LogClassFuncInfos
-    def InitGUI(self):
+    def initGUI(self):
         sys.exit('Controller must rewrite the InitGUI function')
 
     @Log.LogClassFuncInfos
-    def SetModel(self, model):
+    def setModel(self, model):
         sys.exit('Controller must rewrite the SetModel function')
 
     @Log.LogClassFuncInfos
-    def Update(self, model):
+    def update(self, model):
         sys.exit('Controller must rewrite the Update function')

@@ -11,7 +11,11 @@ import Controller.Log as Log
 from Controller import Log
 import Controller.ParaSetting as Setting
 
-
+def displayImg(img):
+    import matplotlib.pyplot as plt
+    plt.figure()
+    plt.imshow(img,cmap='gray')
+    plt.show()
 class DicomBasicContrastViewer(QLabel):
 
     @Log.LogClassFuncInfos
@@ -58,6 +62,7 @@ class DicomBasicContrastViewer(QLabel):
 
     @Log.LogClassFuncInfos
     def resizeEvent(self, event):
+        print(self.height(),self.width())
         self.updateImgSize()
 
     @Log.LogClassFuncInfos
@@ -68,6 +73,10 @@ class DicomBasicContrastViewer(QLabel):
         zoomImg = imresize(self.__originalImg, [int(size[0]), int(size[1])], 'lanczos', mode='I')
         self.__displayImg = zoomImg
         self.updateViewer()
+
+    @Log.LogClassFuncInfos
+    def resize(self, width, height):
+        super(DicomBasicContrastViewer, self).resize(width,height)
 
     @Log.LogClassFuncInfos
     def updateViewer(self):
@@ -100,6 +109,9 @@ class DicomBasicContrastViewer(QLabel):
 
     @Log.LogClassFuncInfos
     def mouseMoveEvent(self, QMouseEvent):
+
+        # print(self.height(),self.width())
+
         pos = QMouseEvent.pos()
         self.__currentPoint = [pos.x(), pos.y()]
         if self.__pressPoint[0] is not -1 and self.__pressPoint[1] is not -1:

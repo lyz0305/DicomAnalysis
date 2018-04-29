@@ -30,13 +30,13 @@ class SequenceModel(BaseModel):
         self.__Sequence = dict()
 
     @Log.LogClassFuncInfos
-    def SetSequence(self, Sequence):
+    def setSequence(self, Sequence):
         if Sequence is not self.__Sequence:
             self.__Sequence = Sequence
             self.Notify()
 
     @Log.LogClassFuncInfos
-    def GetSequence(self):
+    def getSequence(self):
         return self.__Sequence
 
 class SequenceInfoModel(BaseModel):
@@ -48,13 +48,13 @@ class SequenceInfoModel(BaseModel):
         self.__sequenceInfo = dict()
 
     @Log.LogClassFuncInfos
-    def SetSequenceInfo(self,Info):
+    def setSequenceInfo(self,Info):
         if Info is not self.__sequenceInfo:
             self.__sequenceInfo = Info
             self.Notify()
 
     @Log.LogClassFuncInfos
-    def GetSequenceInfo(self):
+    def getSequenceInfo(self):
         return self.__sequenceInfo.copy()
 
 class DisplayImageModel(BaseModel):

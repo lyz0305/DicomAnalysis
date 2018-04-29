@@ -9,5 +9,5 @@ class Observe:
         pass
 
     @Log.LogClassFuncInfos
-    def Update(self,model):
+    def update(self,model):
         sys.exit('Controller must rewrite the Update function')

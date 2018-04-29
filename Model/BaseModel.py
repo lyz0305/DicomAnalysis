@@ -19,5 +19,5 @@ class BaseModel:
     @Log.LogClassFuncInfos
     def Notify(self):
         for i in range(len(self.__observes)):
-            self.__observes[i].Update(self)
+            self.__observes[i].update(self)
 

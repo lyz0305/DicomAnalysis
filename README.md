@@ -14,3 +14,7 @@ V A.B.C
 A: a product
 B: a big update
 C: a update about a module
+
+Name rules:
+
+ex. setImage
