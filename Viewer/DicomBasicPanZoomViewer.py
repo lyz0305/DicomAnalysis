@@ -18,18 +18,18 @@ class DicomBasicPanZoomViewer(QLabel):
     @Log.LogClassFuncInfos
     def __init__(self,parent=None):
         super(DicomBasicPanZoomViewer,self).__init__(parent)
-        self.PanAble = True
-        self.ZoomAble = True
-        self.ContrastAble = True
+        self.__panAble = True
+        self.__zoomAble = True
+        self.__contrastAble = True
         self.setStyleSheet("background-color:black")
         self.setMouseTracking(True)
         self.setMinimumSize(1,1)
-        self.pan = [0,0]
+        self.__pan = [0,0]
 
 
-        self.contrastlabel = DicomBasicContrastViewer()
-        self.contrastlabelSize = [self.contrastlabel.width(),self.contrastlabel.height()]
-        self.contrastlabel.setParent(self)
+        self.__contrastlabel = DicomBasicContrastViewer()
+        self.contrastlabelSize = [self.__contrastlabel.width(),self.__contrastlabel.height()]
+        self.__contrastlabel.setParent(self)
         height = self.height()
         width = self.width()
         x = width/2-self.contrastlabelSize[0]/2
@@ -42,19 +42,19 @@ class DicomBasicPanZoomViewer(QLabel):
 
     @Log.LogClassFuncInfos
     def contrastLabelPan(self,x,y):
-        geo = self.contrastlabel.geometry()
-        self.contrastlabel.setGeometry(geo.x()+x,geo.y()+y,geo.width(),geo.height())
+        geo = self.__contrastlabel.geometry()
+        self.__contrastlabel.setGeometry(geo.x()+x,geo.y()+y,geo.width(),geo.height())
 
     @Log.LogClassFuncInfos
     def contraslLabelZoom(self,x,y):
         r = min([x,y])
-        geo = self.contrastlabel.geometry()
+        geo = self.__contrastlabel.geometry()
         height = geo.height() + r*Setting.zoomRatio
         width = geo.width() + r*Setting.zoomRatio
 
         x = geo.x()+geo.width()/2 - width/2
         y = geo.y()+geo.height()/2 - height/2
-        self.contrastlabel.setGeometry(x,y,width,height)
+        self.__contrastlabel.setGeometry(x,y,width,height)
 
     @Log.LogClassFuncInfos
     def setImage(self,image):
@@ -64,12 +64,12 @@ class DicomBasicPanZoomViewer(QLabel):
         :return:
         '''
         self.originalImg = image
-        self.contrastlabel.setImage(image)
+        self.__contrastlabel.setImage(image)
         width,height = image.shape
-        self.contrastlabel.resize(width,height)
+        self.__contrastlabel.resize(width,height)
         x = self.width()/2 - width/2
         y = self.height()/2 - height/2
-        self.contrastlabel.setGeometry(x,y,width,height)
+        self.__contrastlabel.setGeometry(x,y,width,height)
 
         self.resizeEvent([])
 
@@ -80,7 +80,7 @@ class DicomBasicPanZoomViewer(QLabel):
 
     @Log.LogClassFuncInfos
     def updateViewer(self):
-        self.contrastlabel.updateViewer()
+        self.__contrastlabel.updateViewer()
 
     @Log.LogClassFuncInfos
     def mousePressEvent(self, QMouseEvent):
@@ -100,16 +100,16 @@ class DicomBasicPanZoomViewer(QLabel):
 
     @Log.LogClassFuncInfos
     def SetPanAble(self, able):
-        self.PanAble = able
+        self.__panAble = able
 
     @Log.LogClassFuncInfos
     def SetZoomAble(self, able):
-        self.ZoomAble = able
+        self.__zoomAble = able
 
     @Log.LogClassFuncInfos
     def SetContrastAble(self, able):
-        self.ContrastAble = able
-        self.contrastlabel.SetContrastAble(able)
+        self.__contrastAble = able
+        self.__contrastlabel.SetContrastAble(able)
 
     @Log.LogClassFuncInfos
     def mouseMoveEvent(self, QMouseEvent):
@@ -118,10 +118,10 @@ class DicomBasicPanZoomViewer(QLabel):
 
         if self.pressPoint[0] is not -1 and self.pressPoint[1] is not -1:
 
-            if self.PanAble and Event.MouseMoveEvent(QMouseEvent) == Event.Pan:
+            if self.__panAble and Event.MouseMoveEvent(QMouseEvent) == Event.Pan:
                 self.contrastLabelPan(self.currentPoint[0]-self.oldPoint[0],self.currentPoint[1]-self.oldPoint[1])
 
-            elif self.ZoomAble and Event.MouseMoveEvent(QMouseEvent) == Event.Zoom:
+            elif self.__zoomAble and Event.MouseMoveEvent(QMouseEvent) == Event.Zoom:
                 self.contraslLabelZoom(self.currentPoint[0]-self.oldPoint[0],self.currentPoint[1]-self.oldPoint[1])
 
 

@@ -5,19 +5,19 @@ class BaseModel:
     @Log.LogClassFuncInfos
     def __init__(self):
 
-        self.Observes = []
+        self.__observes = []
 
     @Log.LogClassFuncInfos
     def AddObserves(self, observe):
-        N = len(self.Observes)
+        N = len(self.__observes)
         for i in range(N):
-            if observe.Name is self.Observes[i].Name:
-                self.Observes[i] = observe
+            if observe.Name is self.__observes[i].Name:
+                self.__observes[i] = observe
                 return
-        self.Observes.append(observe)
+        self.__observes.append(observe)
 
     @Log.LogClassFuncInfos
     def Notify(self):
-        for i in range(len(self.Observes)):
-            self.Observes[i].Update(self)
+        for i in range(len(self.__observes)):
+            self.__observes[i].Update(self)
 

@@ -40,15 +40,15 @@ class ThumbnailListWidget(QListWidget):
     @Log.LogClassFuncInfos
     def __init__(self):
         super(ThumbnailListWidget, self).__init__()
-        self.patientName = None
+        self.__patientName = None
 
     @Log.LogClassFuncInfos
     def setPatientName(self, name):
-        self.patientName = name
+        self.__patientName = name
 
     @Log.LogClassFuncInfos
     def getPatientName(self):
-        return self.patientName
+        return self.__patientName
 
     @Log.LogClassFuncInfos
     def setAllToNotSelected(self):

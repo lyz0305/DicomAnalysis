@@ -11,6 +11,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from Controller import ParaSetting
 from Controller import Log
+from Controller import DicomViewerThread
 
 
 class DicomToolViewController(DicomViewerBasePanelController, Observe):
@@ -19,7 +20,7 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
     def __init__(self):
         self.Name = 'DicomToolViewController'
         super(DicomToolViewController, self).__init__()
-        self.layout = QHBoxLayout()
+        self.__layout = QHBoxLayout()
 
     @Log.LogClassFuncInfos
     def InitGUI(self):
@@ -48,8 +49,8 @@ class DicomToolMainPanelController(DicomViewerBasePanelController, Observe):
     def __init__(self):
         self.Name = 'DicomToolMainPanelController'
         super(DicomToolMainPanelController,self).__init__()
-        self.layout = QHBoxLayout()
-        self.DisplayModelsModel = None
+        self.__layout = QHBoxLayout()
+        self.__displayModelsModel = None
 
     @Log.LogClassFuncInfos
     def InitGUI(self):
@@ -57,7 +58,7 @@ class DicomToolMainPanelController(DicomViewerBasePanelController, Observe):
 
     @Log.LogClassFuncInfos
     def InitModel(self):
-        self.DisplayModelsModel = DisplayModelsModel()
+        self.__displayModelsModel = DisplayModelsModel()
 
     @Log.LogClassFuncInfos
     def Update(self,model):
@@ -65,9 +66,9 @@ class DicomToolMainPanelController(DicomViewerBasePanelController, Observe):
 
     @Log.LogClassFuncInfos
     def SetModel(self, model):
-        if model.Name == self.DisplayModelsModel.Name:
-            self.DisplayModelsModel.Name = model
-            self.DisplayModelsModel.AddObserves(self)
+        if model.Name == self.__displayModelsModel.Name:
+            self.__displayModelsModel.Name = model
+            self.__displayModelsModel.AddObserves(self)
 
     @Log.LogClassFuncInfos
     def SetLayout(self, layout):
@@ -82,9 +83,9 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
         self.Name = 'DicomToolThumbnailController'
         self.listWidgets = []
         self.layout = QVBoxLayout()
-        self.SequenceModel = SequenceModel()
-        self.SequenceInfoModel = SequenceInfoModel()
-        self.DisplayModelsModel = DisplayModelsModel()
+        self.__sequenceModel = SequenceModel()
+        self.__sequenceInfoModel = SequenceInfoModel()
+        self.__displayModelsModel = DisplayModelsModel()
 
     @Log.LogClassFuncInfos
     def InitGUI(self):
@@ -96,14 +97,14 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
 
     @Log.LogClassFuncInfos
     def Update(self,model):
-        if model.Name == self.SequenceInfoModel.Name:
+        if model.Name == self.__sequenceInfoModel.Name:
             self.SequenceInfoChange()
 
     @Log.LogClassFuncInfos
     def updatePatient(self):
-        SequenceInfos = self.SequenceInfoModel.GetSequenceInfo()
-        if len(SequenceInfos.keys()) == 2:
-            pass
+        SequenceInfos = self.__sequenceInfoModel.GetSequenceInfo()
+        # if len(SequenceInfos.keys()) == 2:
+        #     pass
         if len(SequenceInfos.keys()) is len(self.listWidgets):
             return
         patients = None
@@ -165,7 +166,7 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
 
     @Log.LogClassFuncInfos
     def SequenceInfoChange(self):
-        SequenceInfos = self.SequenceInfoModel.GetSequenceInfo()
+        SequenceInfos = self.__sequenceInfoModel.GetSequenceInfo()
         self.updatePatient()
         for patientName in SequenceInfos.keys():
             for listWidget in self.listWidgets:
@@ -198,14 +199,14 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
 
     @Log.LogClassFuncInfos
     def SetModel(self, model):
-        if model.Name is self.SequenceModel.Name:
-            self.SequenceModel = model
+        if model.Name is self.__sequenceModel.Name:
+            self.__sequenceModel = model
             model.AddObserves(self)
-        elif model.Name is self.SequenceInfoModel.Name:
-            self.SequenceInfoModel = model
+        elif model.Name is self.__sequenceInfoModel.Name:
+            self.__sequenceInfoModel = model
             model.AddObserves(self)
-        elif model.Name is self.DisplayModelsModel.Name:
-            self.DisplayModelsModel = model
+        elif model.Name is self.__displayModelsModel.Name:
+            self.__displayModelsModel = model
             model.AddObserves(self)
 
     @Log.LogClassFuncInfos
@@ -232,39 +233,39 @@ class DicomToolPageController(Observe):
     def __init__(self):
         super(DicomToolPageController,self).__init__()
         self.Name = 'DicomToolPageController'
-        self.MainPanelController = DicomToolMainPanelController()
-        self.ThumbnailControlelr = DicomToolThumbnailController()
+        self.__mainPanelController = DicomToolMainPanelController()
+        self.__thumbnailControlelr = DicomToolThumbnailController()
         self.InitModel()
 
     @Log.LogClassFuncInfos
     def InitModel(self):
-        self.ImageNamesModel = ImageNamesModel()
-        self.SequenceModel = SequenceModel()
-        self.SequenceInfoModel = SequenceInfoModel()
-        self.DisplayModelsModel = DisplayModelsModel()
+        self.__imageNamesModel = ImageNamesModel()
+        self.__sequenceModel = SequenceModel()
+        self.__sequenceInfoModel = SequenceInfoModel()
+        self.__displayModelsModel = DisplayModelsModel()
 
-        self.ImageNamesModel.AddObserves(self)
-        self.SequenceModel.AddObserves(self)
+        self.__imageNamesModel.AddObserves(self)
+        self.__sequenceModel.AddObserves(self)
         # self.SequenceInfoModel.AddObserves(self)
 
-        self.MainPanelController.InitModel()
-        self.ThumbnailControlelr.InitModel()
+        self.__mainPanelController.InitModel()
+        self.__thumbnailControlelr.InitModel()
         self.SetModelDown()
 
     @Log.LogClassFuncInfos
     def InitGUI(self):
-        self.MainPanelController.InitGUI()
-        self.ThumbnailControlelr.InitGUI()
+        self.__mainPanelController.InitGUI()
+        self.__thumbnailControlelr.InitGUI()
 
     @Log.LogClassFuncInfos
     def SetModelDown(self):
-        self.MainPanelController.SetModel(self.ImageNamesModel)
-        self.ThumbnailControlelr.SetModel(self.ImageNamesModel)
-        self.MainPanelController.SetModel(self.SequenceModel)
-        self.ThumbnailControlelr.SetModel(self.SequenceModel)
-        self.ThumbnailControlelr.SetModel(self.SequenceInfoModel)
-        self.MainPanelController.SetModel(self.DisplayModelsModel)
-        self.ThumbnailControlelr.SetModel(self.DisplayModelsModel)
+        self.__mainPanelController.SetModel(self.__imageNamesModel)
+        self.__thumbnailControlelr.SetModel(self.__imageNamesModel)
+        self.__mainPanelController.SetModel(self.__sequenceModel)
+        self.__thumbnailControlelr.SetModel(self.__sequenceModel)
+        self.__thumbnailControlelr.SetModel(self.__sequenceInfoModel)
+        self.__mainPanelController.SetModel(self.__displayModelsModel)
+        self.__thumbnailControlelr.SetModel(self.__displayModelsModel)
 
     @Log.LogClassFuncInfos
     def SetLayout(self, layout):
@@ -275,50 +276,61 @@ class DicomToolPageController(Observe):
         self.layout.addLayout(thumbnailLayout)
         self.layout.addStretch()
         self.layout.addLayout(mainPanalLayout)
-        self.MainPanelController.SetLayout(mainPanalLayout)
-        self.ThumbnailControlelr.SetLayout(thumbnailLayout)
+        self.__mainPanelController.SetLayout(mainPanalLayout)
+        self.__thumbnailControlelr.SetLayout(thumbnailLayout)
 
     @Log.LogClassFuncInfos
     def SetModel(self, model):
         if model.Name == 'ImageNamesModel':
-            self.ImageNamesModel = model
-            self.ImageNamesModel.AddObserves(self)
+            self.__imageNamesModel = model
+            self.__imageNamesModel.AddObserves(self)
 
 
         self.SetModelDown()
 
     @Log.LogClassFuncInfos
     def Update(self,model):
-        if model.Name == self.ImageNamesModel.Name:
+        if model.Name == self.__imageNamesModel.Name:
             self.ImageNamesChange()
 
     @Log.LogClassFuncInfos
     def ImageNamesChange(self):
-        ImageNames = self.ImageNamesModel.getImageNames()
+        ImageNames = self.__imageNamesModel.getImageNames()
         if ImageNames is None:
             return
 
-        N = len(ImageNames)
-        reader = sitk.ImageFileReader()
-        for i in range(N):
-            name = ImageNames[i]
-            reader.SetFileName(name)
-            reader.LoadPrivateTagsOn()
-            reader.ReadImageInformation()
-            series_description = reader.GetMetaData(Tags['SeriesDescription'])
-            series_number = reader.GetMetaData(Tags['SeriesNumber'])
-            instance_number = reader.GetMetaData(Tags['InstanceNumber'])
-            patient_name = reader.GetMetaData(Tags['PatientName'])
-            name = series_number + ' ' + series_description
-            SequenceInfo = self.SequenceInfoModel.GetSequenceInfo()
-            if patient_name not in SequenceInfo.keys():
-                SequenceInfo[patient_name] = dict()
-            if name not in SequenceInfo[patient_name].keys():
-                SequenceInfo[patient_name][name] = dict()
-            SequenceInfo[patient_name][name][int(instance_number)] = ImageNames[i]
+        # sequenceInfo = self.SequenceInfoModel.GetSequenceInfo()
+        # sequenceInfo = dict()
+        # sequenceInfo['patient'] = dict()
+        # sequenceInfo['patient']['r'] = dict()
+        # sequenceInfo['patient']['r'][1] = 'G:\\SNAP_Signal_Analysis\\snap_simulation\\SNAP_TOF_Data\\Chang Cheng\\SNAP\\IM_0502'
+        # self.SequenceInfoModel.SetSequenceInfo(sequenceInfo)
+        self.__thread = DicomViewerThread.DicomHeaderReaderThread()
+        self.__thread.setModel(self.__sequenceInfoModel)
+        self.__thread.setImageNames(ImageNames)
+        self.__thread.start()
 
-            self.SequenceInfoModel.SetSequenceInfo(SequenceInfo)
-        pass
+        # N = len(ImageNames)
+        # reader = sitk.ImageFileReader()
+        # for i in range(N):
+        #     name = ImageNames[i]
+        #     reader.SetFileName(name)
+        #     reader.LoadPrivateTagsOn()
+        #     reader.ReadImageInformation()
+        #     series_description = reader.GetMetaData(Tags['SeriesDescription'])
+        #     series_number = reader.GetMetaData(Tags['SeriesNumber'])
+        #     instance_number = reader.GetMetaData(Tags['InstanceNumber'])
+        #     patient_name = reader.GetMetaData(Tags['PatientName'])
+        #     name = series_number + ' ' + series_description
+        #     SequenceInfo = self.SequenceInfoModel.GetSequenceInfo()
+        #     if patient_name not in SequenceInfo.keys():
+        #         SequenceInfo[patient_name] = dict()
+        #     if name not in SequenceInfo[patient_name].keys():
+        #         SequenceInfo[patient_name][name] = dict()
+        #     SequenceInfo[patient_name][name][int(instance_number)] = ImageNames[i]
+        #
+        #     self.SequenceInfoModel.SetSequenceInfo(SequenceInfo)
+
 
 if __name__ == '__main__':
 
