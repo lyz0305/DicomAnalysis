@@ -4,7 +4,7 @@ class BaseModel:
 
     @Log.LogClassFuncInfos
     def __init__(self):
-
+        self.Name = self.__class__.__name__
         self.__observes = []
 
     @Log.LogClassFuncInfos

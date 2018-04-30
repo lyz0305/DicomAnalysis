@@ -44,7 +44,6 @@ class SequenceInfoModel(BaseModel):
     @Log.LogClassFuncInfos
     def __init__(self):
         super(SequenceInfoModel,self).__init__()
-        self.Name = 'SequenceInfoModel'
         self.__sequenceInfo = dict()
 
     @Log.LogClassFuncInfos
@@ -57,24 +56,24 @@ class SequenceInfoModel(BaseModel):
     def getSequenceInfo(self):
         return self.__sequenceInfo.copy()
 
-class DisplayImageModel(BaseModel):
-
+class AddImageInfoModel(BaseModel):
+    '''
+    when a more image need to be shown, a more DisplayInfoModel would be created
+    then, the AddImageInfoModel would be change
+    '''
     @Log.LogClassFuncInfos
     def __init__(self):
-        super(DisplayImageModel, self).__init__()
-        self.Name = 'DisplayImageModel'
-        self.__Img = None
+        super(AddImageInfoModel, self).__init__()
+        self.__displayInfoModel = None
 
     @Log.LogClassFuncInfos
-    def setImage(self, image):
-        if image is not self.__Img:
-            self.__Img = image
-            self.Notify()
+    def setDisplayInfoModel(self, displayInfoModel):
+        if displayInfoModel is not self.__displayInfoModel:
+            self.__displayInfoModel = displayInfoModel
 
     @Log.LogClassFuncInfos
-    def getImage(self):
-        return self.__Img
-
+    def getDisplayInfoModel(self):
+        return self.__displayInfoModel
 
 class DisplayInfoModel(BaseModel):
 
@@ -124,6 +123,11 @@ class DisplayModelsModel(BaseModel):
     @Log.LogClassFuncInfos
     def getDisplayModels(self):
         return self.__displayModels
+
+    @Log.LogClassFuncInfos
+    def addDisplayModels(self,model):
+        self.__displayModels.append(model)
+        self.Notify()
 
 if __name__=='__main__':
 

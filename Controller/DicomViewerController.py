@@ -16,12 +16,16 @@ import pydicom
 
 
 class DicomToolViewController(DicomViewerBasePanelController, Observe):
-
+    '''
+    the dicom may display two or more image in the same time
+    we need a controller to control each image
+    '''
     @Log.LogClassFuncInfos
     def __init__(self):
         self.Name = 'DicomToolViewController'
         super(DicomToolViewController, self).__init__()
         self.__layout = QHBoxLayout()
+        self.__displayInfoModel = DisplayInfoModel()
 
     @Log.LogClassFuncInfos
     def initGUI(self):
@@ -37,7 +41,9 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
 
     @Log.LogClassFuncInfos
     def setModel(self, model):
-        pass
+        if model.Name is self.__displayInfoModel.Name:
+            self.__displayInfoModel = model
+            self.__displayInfoModel.AddObserves(self)
 
     @Log.LogClassFuncInfos
     def setLayout(self, layout):
@@ -131,9 +137,14 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
         if len(self.__listWidgets) is 0:
             patients = list(SequenceInfos.keys())[0]
         for patientName in SequenceInfos.keys():
+            Flag = True
             for listWidget in self.__listWidgets:
-                if patientName is not listWidget.getPatientName():
-                    patients = patientName
+                if patientName is listWidget.getPatientName():
+                    Flag = False
+                    break
+            if Flag is True:
+                patients = patientName
+
 
         if patients is not None:
             listWidget = ThumbnailListWidget()
@@ -217,6 +228,8 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
                             listWidget.addItem(thum_widgetItem)
                             listWidget.setItemWidget(thum_widgetItem, thum)
 
+                            self.showAllImage()
+
     @Log.LogClassFuncInfos
     def setModel(self, model):
         if model.Name is self.__sequenceModel.Name:
@@ -263,8 +276,9 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
                     instance = list(images.keys())
                     instance.sort()
                     midInstance = instance[len(instance)//2]
-                    midImgPath = images[midInstance]
-                    ds = pydicom.dcmread(midImgPath)
+                    imgPath = images[midInstance]
+                    # imgPath = images[instance[0]]
+                    ds = pydicom.dcmread(imgPath)
                     img = ds.pixel_array
                     widget.setImage(img)
 
@@ -280,7 +294,9 @@ class DicomToolPageController(Observe):
         self.__mainPanelController = DicomToolMainPanelController()
         self.__thumbnailControlelr = DicomToolThumbnailController()
         self.__statusController = DicomStatusController()
+        self.__dicomViewControllerLists = []
         self.__numberReadDicomHeader = 0
+
         self.initModel()
 
     @Log.LogClassFuncInfos
@@ -358,7 +374,6 @@ class DicomToolPageController(Observe):
         self.__thread.allDicomFinishConnect(self.allDicomHeaderRead)
         self.__thread.setImageNames(ImageNames)
         self.__thread.start()
-        pass
 
     @Log.LogClassFuncInfos
     def aDicomHeaderRead(self, patientName, seryName, instanceNumber, path):
@@ -373,9 +388,30 @@ class DicomToolPageController(Observe):
         self.__statusController.setText('%d/%d'%(self.__numberReadDicomHeader, len(self.__imageNamesModel.getImageNames())))
 
     @Log.LogClassFuncInfos
+    def addDicomView(self, patienName, seryName):
+        pass
+
+    @Log.LogClassFuncInfos
     def allDicomHeaderRead(self):
         self.__thumbnailControlelr.showAllImage()
         self.__statusController.setText('%d/%d' %(len(self.__imageNamesModel.getImageNames()), len(self.__imageNamesModel.getImageNames())))
+
+
+        # displayInfoModel = DisplayInfoModel()
+        # sequenceInfo = self.__sequenceInfoModel.getSequenceInfo()
+        # patientName = list(sequenceInfo.keys())[0]
+        # seryName = list(sequenceInfo[patientName].keys())[0]
+        #
+        # images = sequenceInfo[patientName][seryName]
+        # instance = list(images.keys())
+        # instance.sort()
+        # midInstance = instance[len(instance) // 2]
+        #
+        # displayInfoModel.setDisplayInfo(patientName,seryName,midInstance)
+        # dicomToolViewController = DicomToolViewController()
+        # self.__dicomViewControllerLists.append(dicomToolViewController)
+
+
 
 
 if __name__ == '__main__':
