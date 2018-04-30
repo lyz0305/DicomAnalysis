@@ -11,6 +11,8 @@ class CharacterDisplayLabel(QLabel):
     @Log.LogClassFuncInfos
     def __init__(self):
         super(CharacterDisplayLabel,self).__init__()
+        self.__property = dict()
+
         ft = QFont()
         ft.setPointSize(12)
         self.setFont(ft)
@@ -35,27 +37,38 @@ class CharacterDisplayLabel(QLabel):
     def setFixedHeight(self, height):
         super(CharacterDisplayLabel, self).setFixedHeight(height)
 
-class ThumbnailListWidget(QListWidget):
+    @Log.LogClassFuncInfos
+    def setProperty(self, name, val):
+        self.__property[name] = val
 
     @Log.LogClassFuncInfos
-    def __init__(self):
-        super(ThumbnailListWidget, self).__init__()
-        self.__patientName = None
+    def getProperty(self, name):
+        if name in self.__property.keys():
+            return self.__property[name]
+        else:
+            return None
 
-    @Log.LogClassFuncInfos
-    def setPatientName(self, name):
-        self.__patientName = name
-
-    @Log.LogClassFuncInfos
-    def getPatientName(self):
-        return self.__patientName
-
-    @Log.LogClassFuncInfos
-    def setAllToNotSelected(self):
-        N = self.count()
-        for i in range(N):
-            widgetItem = self.item(i)
-            widget = self.itemWidget(widgetItem)
-            if isinstance(widget,
-                          DicomViewViewer.ThumbnailViewer):
-                widget.setSelectState(False)
+# class ThumbnailListWidget(QListWidget):
+#
+#     @Log.LogClassFuncInfos
+#     def __init__(self):
+#         super(ThumbnailListWidget, self).__init__()
+#         self.__patientName = None
+#
+#     @Log.LogClassFuncInfos
+#     def setPatientName(self, name):
+#         self.__patientName = name
+#
+#     @Log.LogClassFuncInfos
+#     def getPatientName(self):
+#         return self.__patientName
+#
+#     @Log.LogClassFuncInfos
+#     def setAllToNotSelected(self):
+#         N = self.count()
+#         for i in range(N):
+#             widgetItem = self.item(i)
+#             widget = self.itemWidget(widgetItem)
+#             if isinstance(widget,
+#                           DicomViewViewer.ThumbnailViewer):
+#                 widget.setSelectState(False)

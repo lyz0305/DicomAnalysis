@@ -10,11 +10,14 @@ from Viewer.AuxiliaryClass import CharacterDisplayLabel
 from Controller import ParaSetting
 
 class ThumbnailViewer(QLabel):
-
+    '''
+    display a thumbnial, including the sery name and the image
+    '''
     @Log.LogClassFuncInfos
     def __init__(self):
         super(ThumbnailViewer,self).__init__()
-        self.seriesName = None
+        self.__seryName = None
+        self.__patientName = None
         self.selected = False
         self.setFixedHeight(ParaSetting.ThumbnailViewHeight)
         self.layout = QVBoxLayout()
@@ -34,13 +37,21 @@ class ThumbnailViewer(QLabel):
         self.layout.addWidget(self.thumbnail_image)
 
     @Log.LogClassFuncInfos
-    def setSeriesName(self, str):
+    def setSeryName(self, str):
         self.name_label.setText(str)
-        self.seriesName = str
+        self.__seryName = str
 
     @Log.LogClassFuncInfos
-    def getSeriesName(self):
-        return self.seriesName
+    def getSeryName(self):
+        return self.__seryName
+
+    @Log.LogClassFuncInfos
+    def setPatientName(self, patientName):
+        self.__patientName = patientName
+
+    @Log.LogClassFuncInfos
+    def getPatientName(self):
+        return self.__patientName
 
     @Log.LogClassFuncInfos
     def setImage(self, image):

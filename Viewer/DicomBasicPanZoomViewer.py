@@ -82,8 +82,6 @@ class DicomBasicPanZoomViewer(QLabel):
 
     @Log.LogClassFuncInfos
     def resizeEvent(self, event):
-        print(self.height(), self.width())
-        # self.__contrastlabel.resize(200,50)
         self.__contrastlabel.resize(self.width(), self.height())
         self.updateViewer()
 

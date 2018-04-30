@@ -62,7 +62,6 @@ class DicomBasicContrastViewer(QLabel):
 
     @Log.LogClassFuncInfos
     def resizeEvent(self, event):
-        print(self.height(),self.width())
         self.updateImgSize()
 
     @Log.LogClassFuncInfos
