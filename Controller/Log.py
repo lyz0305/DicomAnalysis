@@ -25,8 +25,9 @@ def LogClassFuncInfos(func):
                 f.write('\t')
 
             className = format(self.__class__.__name__)
-            f.write('%s, %s, %04d%02d%02d%02d%02d%02d\n' % (className, methodName, T.tm_year, T.tm_mon, T.tm_mday,
-                                                            T.tm_hour, T.tm_min, T.tm_sec))
+            f.write('%04d%02d%02d%02d%02d%02d, %s, %s\n' % (T.tm_year, T.tm_mon, T.tm_mday,
+                                                            T.tm_hour, T.tm_min, T.tm_sec,
+                                                            className, methodName))
 
         numberOfSpace = numberOfSpace + 1
         ret = func(*s, **gs)

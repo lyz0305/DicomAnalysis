@@ -34,7 +34,8 @@ class DicomBasicPanZoomViewer(QLabel):
         width = self.width()
         x = width/2-self.contrastlabelSize[0]/2
         y = height/2-self.contrastlabelSize[1]/2
-        self.setGeometry(x,y,self.contrastlabelSize[0],self.contrastlabelSize[1])
+        # self.setGeometry(x,y,self.contrastlabelSize[0],self.contrastlabelSize[1])
+        self.__contrastlabel.setGeometry(x,y,self.contrastlabelSize[0],self.contrastlabelSize[1])
         self.pressPoint = [-1, -1]
         self.releasePoint = [-1, -1]
         self.currentPoint = [-1, -1]
@@ -70,18 +71,25 @@ class DicomBasicPanZoomViewer(QLabel):
         # x = self.width()/2 - width/2
         # y = self.height()/2 - height/2
 
-    @Log.LogClassFuncInfos
-    def resetGeometryByImg(self):
-        width, height = self.__originalImg.shape
-        self.__contrastlabel.resize(width,height)
-        x = self.width()/2 - width/2
-        y = self.height()/2 - height/2
-        self.__contrastlabel.setGeometry(x,y,width,height)
-        pass
+    # @Log.LogClassFuncInfos
+    # def resetGeometryByImg(self):
+    #     geo = self.geometry()
+    #     print('resetGeometryByImg, x: %d, y: %d, width: %d, height: %d'%(geo.x(),geo.y(),geo.width(), geo.height()))
+    #     width, height = self.__originalImg.shape
+    #     self.__contrastlabel.resize(width,height)
+    #     x = self.width()/2 - width/2
+    #     y = self.height()/2 - height/2
+    #     self.__contrastlabel.setGeometry(x,y,width,height)
+    #     pass
         # self.resizeEvent([])
 
     @Log.LogClassFuncInfos
     def resizeEvent(self, event):
+        geo = self.geometry()
+
+        print('PanZoomViewer: x: %d, y: %d, width: %d, height: %d'%(geo.x(),geo.y(), geo.width(), geo.height()))
+        # self.setGeometry(0,0,geo.width(), geo.height())
+
         self.__contrastlabel.resize(self.width(), self.height())
         self.updateViewer()
 
@@ -145,7 +153,7 @@ if __name__ == '__main__':
         def __init__(self, parent=None):
             super(MainWindow, self).__init__(parent)
             self.setWindowTitle("QDicomLabel Test")
-            # self.showMaximized()
+            self.showMaximized()
             self.resize(500,500)
 
             self.setAttribute(Qt.WA_Hover,True)
@@ -156,7 +164,7 @@ if __name__ == '__main__':
             # self.imagelabel.show()
             width = self.imagelabel.width()
             height = self.imagelabel.height()
-            self.imagelabel.setGeometry(0, 0,  height,  width)
+            # self.imagelabel.setGeometry(0, 0,  height,  width)
 
 
             # layout = QHBoxLayout()

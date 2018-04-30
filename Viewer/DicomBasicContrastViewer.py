@@ -62,20 +62,27 @@ class DicomBasicContrastViewer(QLabel):
 
     @Log.LogClassFuncInfos
     def resizeEvent(self, event):
+
+        geo = self.geometry()
+
+        print('ContrastViewer: x: %d, y: %d, width: %d, height: %d' % (geo.x(), geo.y(), geo.width(), geo.height()))
+
         self.updateImgSize()
 
     @Log.LogClassFuncInfos
     def updateImgSize(self):
         if self.__originalImg is None:
             return
-        size = [self.height(), self.width()]
-        zoomImg = imresize(self.__originalImg, [int(size[0]), int(size[1])], 'lanczos', mode='I')
+        size = [self.width(), self.height()]
+        s = min(size)
+        zoomImg = imresize(self.__originalImg, [s, s], 'lanczos', mode='I')
         self.__displayImg = zoomImg
         self.updateViewer()
 
     @Log.LogClassFuncInfos
     def resize(self, width, height):
-        super(DicomBasicContrastViewer, self).resize(width,height)
+        super(DicomBasicContrastViewer, self).resize(width, height)
+
 
     @Log.LogClassFuncInfos
     def updateViewer(self):

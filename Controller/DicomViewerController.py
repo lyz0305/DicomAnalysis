@@ -12,6 +12,7 @@ from PyQt5.QtCore import *
 from Controller import ParaSetting
 from Controller import Log
 from Controller import DicomViewerThread
+from Viewer.DicomBasicPanZoomViewer import DicomBasicPanZoomViewer
 import pydicom
 
 
@@ -24,16 +25,24 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
     def __init__(self):
         self.Name = 'DicomToolViewController'
         super(DicomToolViewController, self).__init__()
-        self.__layout = QHBoxLayout()
-        self.__displayInfoModel = DisplayInfoModel()
 
     @Log.LogClassFuncInfos
     def initGUI(self):
-        pass
+        self.__layout = QHBoxLayout()
+        self.__imgView = QLabel()
+        self.__sequenceInfoModel = SequenceInfoModel()
+
+    @Log.LogClassFuncInfos
+    def getModel(self, name):
+
+        if self.__displayInfoModel.Name is name:
+            return self.__displayInfoModel
+
+        return None
 
     @Log.LogClassFuncInfos
     def initModel(self):
-        pass
+        self.__displayInfoModel = DisplayInfoModel()
 
     @Log.LogClassFuncInfos
     def update(self,model):
@@ -44,11 +53,38 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
         if model.Name is self.__displayInfoModel.Name:
             self.__displayInfoModel = model
             self.__displayInfoModel.AddObserves(self)
+        elif model.Name is self.__sequenceInfoModel.Name:
+            self.__sequenceInfoModel = model
+
+    @Log.LogClassFuncInfos
+    def initDisplay(self):
+
+        model = self.__displayInfoModel
+        patientName = model.getPatientName()
+        seryName = model.getSeryName()
+        instanceNum = model.getInstanceNumber()
+
+        sequenceInfo = self.__sequenceInfoModel.getSequenceInfo()
+        imgPath = sequenceInfo[patientName][seryName][instanceNum]
+        ds = pydicom.dcmread(imgPath)
+        img = ds.pixel_array
+        img = img.astype(float)*ds.RescaleSlope + ds.RescaleIntercept
+
+        self.__imgView = DicomBasicPanZoomViewer()
+        self.__imgView.setImage(img)
+        self.__layout.addWidget(self.__imgView)
+        # self.__imgView.show()
+
+    @Log.LogClassFuncInfos
+    def getImageView(self):
+        return self.__imgView
 
     @Log.LogClassFuncInfos
     def setLayout(self, layout):
-        pass
-        self.layout = layout
+        self.__layout = layout
+        self.__layout.addWidget(self.__imgView)
+        # self.__layout.setAlignment(Qt.AlignCenter)
+        # self.__imgView.resetGeometryByImg()
 
 class DicomToolMainPanelController(DicomViewerBasePanelController, Observe):
 
@@ -217,7 +253,6 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
             self.__listWidget.insertItem(self.__listWidget.count(), patient_info_widgetItem)
             self.__listWidget.setItemWidget(patient_info_widgetItem, patient_info)
 
-
     @Log.LogClassFuncInfos
     def sequenceInfoChange(self):
         SequenceInfos = self.__sequenceInfoModel.getSequenceInfo()
@@ -244,6 +279,15 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
 
                 self.showAllImage()
 
+                if len(self.__displayModelsModel.getDisplayModels()) is 0:
+
+                    displayInfo = DisplayInfoModel()
+                    instanceNumbers = list(SequenceInfos[patientName][seryName].keys())
+                    instanceNumbers.sort()
+                    displayInfo.setDisplayInfo(patientName, seryName, instanceNumbers[0])
+
+                    self.__displayModelsModel.addDisplayModels(displayInfo)
+
     @Log.LogClassFuncInfos
     def setModel(self, model):
         if model.Name is self.__sequenceModel.Name:
@@ -254,7 +298,7 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
             model.AddObserves(self)
         elif model.Name is self.__displayModelsModel.Name:
             self.__displayModelsModel = model
-            model.AddObserves(self)
+            # model.AddObserves(self)
 
     @Log.LogClassFuncInfos
     def setLayout(self, layout):
@@ -334,7 +378,6 @@ class DicomToolPageController(Observe):
     def __init__(self):
         super(DicomToolPageController,self).__init__()
         self.Name = 'DicomToolPageController'
-        self.__mainPanelController = DicomToolMainPanelController()
         self.__thumbnailControlelr = DicomToolThumbnailController()
         self.__statusController = DicomStatusController()
         self.__dicomViewControllerLists = []
@@ -351,32 +394,28 @@ class DicomToolPageController(Observe):
 
         self.__imageNamesModel.AddObserves(self)
         self.__sequenceModel.AddObserves(self)
-        # self.SequenceInfoModel.AddObserves(self)
+        self.__displayModelsModel.AddObserves(self)
 
-        self.__mainPanelController.initModel()
         self.__thumbnailControlelr.initModel()
         self.setModelDown()
 
     @Log.LogClassFuncInfos
     def initGUI(self):
-        self.__mainPanelController.InitGUI()
+
         self.__thumbnailControlelr.InitGUI()
 
     @Log.LogClassFuncInfos
     def setModelDown(self):
-        self.__mainPanelController.setModel(self.__imageNamesModel)
         self.__thumbnailControlelr.setModel(self.__imageNamesModel)
-        self.__mainPanelController.setModel(self.__sequenceModel)
         self.__thumbnailControlelr.setModel(self.__sequenceModel)
         self.__thumbnailControlelr.setModel(self.__sequenceInfoModel)
-        self.__mainPanelController.setModel(self.__displayModelsModel)
         self.__thumbnailControlelr.setModel(self.__displayModelsModel)
 
     @Log.LogClassFuncInfos
     def setLayout(self, layout):
         self.layout = layout
 
-        mainLayout = QVBoxLayout()
+        mainLayout = QHBoxLayout()
         thumbnailLayout = QVBoxLayout()
         mainPanalLayout = QVBoxLayout()
         mainLayout.addLayout(thumbnailLayout)
@@ -387,9 +426,10 @@ class DicomToolPageController(Observe):
 
         self.layout.addLayout(mainLayout)
         self.layout.addWidget(statusLabel,0,Qt.AlignBottom)
-        self.__mainPanelController.setLayout(mainPanalLayout)
         self.__thumbnailControlelr.setLayout(thumbnailLayout)
         self.__statusController.setLabel(statusLabel)
+
+        self.__mainViewLayout = mainPanalLayout
 
     @Log.LogClassFuncInfos
     def setModel(self, model):
@@ -404,6 +444,52 @@ class DicomToolPageController(Observe):
     def update(self,model):
         if model.Name == self.__imageNamesModel.Name:
             self.imageNamesChange()
+        elif model.Name == self.__displayModelsModel.Name:
+            self.numberOfDisplayChange()
+
+    @Log.LogClassFuncInfos
+    def numberOfDisplayChange(self):
+
+        displayModels = self.__displayModelsModel.getDisplayModels()
+
+        model = None
+        # to find the new model
+        for displayModel in displayModels:
+            Exist = False
+            for viewController in self.__dicomViewControllerLists:
+                if viewController.getModel( displayModels.Name ) is displayModel:
+                    Exist = True
+                    break
+            if Exist is False:
+                model = displayModel
+                break
+
+        if model is None:
+            return
+
+        dicomToolViewController = DicomToolViewController()
+        dicomToolViewController.setModel(model)
+        dicomToolViewController.setModel(self.__sequenceInfoModel)
+        dicomToolViewController.initDisplay()
+        self.__dicomViewControllerLists.append(dicomToolViewController)
+
+        # currently, only one image can be display
+        if len(displayModels) == 1:
+
+            # imgView = dicomToolViewController.getImageView()
+            layout = QHBoxLayout()
+            dicomToolViewController.setLayout(layout)
+
+            #
+            label = QLabel()
+            label.setStyleSheet("background: rgb(255,255,255)")
+            newLayout = QHBoxLayout()
+            # layout.addWidget(imgView)
+            newLayout.addWidget(label)
+            # newLayout.addLayout(layout)
+            # self.__mainViewLayout.addLayout(newLayout)
+            self.__mainViewLayout.addLayout(layout)
+            pass
 
     @Log.LogClassFuncInfos
     def imageNamesChange(self):

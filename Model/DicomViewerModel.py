@@ -99,7 +99,7 @@ class DisplayInfoModel(BaseModel):
         return self.__patientName
 
     @Log.LogClassFuncInfos
-    def getSeriesName(self):
+    def getSeryName(self):
         return self.__seriesName
 
     @Log.LogClassFuncInfos
