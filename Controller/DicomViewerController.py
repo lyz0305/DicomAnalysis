@@ -15,7 +15,6 @@ from Controller import DicomViewerThread
 from Viewer.DicomBasicPanZoomViewer import DicomBasicPanZoomViewer
 import pydicom
 
-
 class DicomToolViewController(DicomViewerBasePanelController, Observe):
     '''
     the dicom may display two or more image in the same time
@@ -31,6 +30,13 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
         self.__layout = QHBoxLayout()
         self.__imgView = QLabel()
         self.__sequenceInfoModel = SequenceInfoModel()
+
+        self.__imgView = DicomBasicPanZoomViewer()
+        self.__imgView.setModel(self.__displayInfoModel)
+
+
+        self.__scrollBar = QScrollBar()
+        self.__scrollBar.valueChanged.connect(self.scrollSliderChange)
 
     @Log.LogClassFuncInfos
     def getModel(self, name):
@@ -76,6 +82,7 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
                 instance = instanceNumbers[cur_instance]
 
         self.__displayInfoModel.setInstanceNumber(instance)
+        self.__scrollBar.setValue(instanceNumbers.index(instance))
 
         imgPath = sequenceInfo[patientName][seryName][instance]
 
@@ -111,12 +118,12 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
         img = ds.pixel_array
         img = img.astype(float)*ds.RescaleSlope + ds.RescaleIntercept
 
-        self.__imgView = DicomBasicPanZoomViewer()
+        layout = QHBoxLayout()
+
+
         self.__imgView.setImage(img)
-        self.__imgView.setModel(self.__displayInfoModel)
-        self.__layout.addWidget(self.__imgView)
         self.__imgView.resetContrast()
-        # self.__imgView.show()
+        self.__imgView.setModel(self.__displayInfoModel)
 
     @Log.LogClassFuncInfos
     def getImageView(self):
@@ -125,14 +132,43 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
     @Log.LogClassFuncInfos
     def setLayout(self, layout):
         self.__layout = layout
-        self.__layout.addWidget(self.__imgView)
-        # self.__layout.setAlignment(Qt.AlignCenter)
-        # self.__imgView.resetGeometryByImg()
+        # self.__layout.addWidget(self.__imgView)
+
+        layout = QHBoxLayout()
+        layout.addWidget(self.__imgView)
+        layout.addWidget(self.__scrollBar)
+        self.__layout.addLayout(layout)
 
     @Log.LogClassFuncInfos
     def seryChange(self, patientName, seryName):
         self.__displayInfoModel.setDisplayInfo(patientName, seryName, None)
         self.__displayInfoModel.instanceChange(ParaSetting.SeryChange)
+
+    @Log.LogClassFuncInfos
+    def imageNumberChange(self):
+        sequenceInfo = self.__sequenceInfoModel.getSequenceInfo()
+        patientName = self.__displayInfoModel.getPatientName()
+        seryName = self.__displayInfoModel.getSeryName()
+        sery = sequenceInfo[patientName][seryName]
+        instanceNumbers = list(sery.keys())
+        self.__scrollBar.setRange(0, len(instanceNumbers)-1)
+        self.__scrollBar.setSingleStep(1)
+
+
+
+    @Log.LogClassFuncInfos
+    def scrollSliderChange(self, val):
+
+        sequenceInfo = self.__sequenceInfoModel.getSequenceInfo()
+        patientName = self.__displayInfoModel.getPatientName()
+        seryName = self.__displayInfoModel.getSeryName()
+        instanceNumber = self.__displayInfoModel.getInstanceNumber()
+        sery = sequenceInfo[patientName][seryName]
+        instanceNumbers = list(sery.keys())
+        instanceNumbers.sort()
+        index = instanceNumbers.index(instanceNumber)
+        change = val - index
+        self.__displayInfoModel.instanceChange(change)
 
 class DicomToolMainPanelController(DicomViewerBasePanelController, Observe):
 
@@ -196,6 +232,10 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
     @Log.LogClassFuncInfos
     def setActiveViewController(self, controller):
         self.__activeViewController = controller
+
+    @Log.LogClassFuncInfos
+    def getActiveViewContrller(self):
+        return self.__activeViewController
 
     @Log.LogClassFuncInfos
     def initGUI(self):
@@ -555,7 +595,7 @@ class DicomToolPageController(Observe):
             reader.ReadImageInformation()
             series_description = reader.GetMetaData(Tags['SeriesDescription'])
             series_number = reader.GetMetaData(Tags['SeriesNumber'])
-            instance_number = reader.GetMetaData(Tags['InstanceNumber'])
+            instance_number = int(reader.GetMetaData(Tags['InstanceNumber']))
             patient_name = reader.GetMetaData(Tags['PatientName'])
             seryName = series_number + ' ' + series_description
 
@@ -563,7 +603,7 @@ class DicomToolPageController(Observe):
             QCoreApplication.processEvents()
 
         self.allDicomHeaderRead()
-        
+
     @Log.LogClassFuncInfos
     def aDicomHeaderRead(self, patientName, seryName, instanceNumber, path):
         sequenceInfo = self.__sequenceInfoModel.getSequenceInfo()
@@ -575,6 +615,7 @@ class DicomToolPageController(Observe):
         self.__sequenceInfoModel.setSequenceInfo(sequenceInfo)
         self.__numberReadDicomHeader = self.__numberReadDicomHeader + 1
         self.__statusController.setText('%d/%d'%(self.__numberReadDicomHeader, len(self.__imageNamesModel.getImageNames())))
+        self.__thumbnailController.getActiveViewContrller().imageNumberChange()
 
     @Log.LogClassFuncInfos
     def addDicomView(self, patienName, seryName):

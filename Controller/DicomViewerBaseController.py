@@ -7,8 +7,8 @@ class DicomViewerBasePanelController:
     @Log.LogClassFuncInfos
     def __init__(self):
         self.Name = self.__class__.__name__
-        self.initGUI()
         self.initModel()
+        self.initGUI()
 
     @Log.LogClassFuncInfos
     def initModel(self):

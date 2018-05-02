@@ -26,7 +26,7 @@ class DicomBasicPanZoomViewer(QLabel):
         self.setMouseTracking(True)
         self.setMinimumSize(1,1)
         self.__pan = [0,0]
-
+        self.__originalImg = None
 
         self.__contrastlabel = DicomBasicContrastViewer()
         self.contrastlabelSize = [self.__contrastlabel.width(),self.__contrastlabel.height()]
@@ -68,11 +68,8 @@ class DicomBasicPanZoomViewer(QLabel):
         width = geo.width() + r*Setting.zoomRatio
 
         self.setSize(width, height)
-        # x = geo.x()+geo.width()/2 - width/2
-        # y = geo.y()+geo.height()/2 - height/2
-        # self.__contrastlabel.setGeometry(x,y,width,height)
 
-    # @Log.LogClassFuncInfos
+    @Log.LogClassFuncInfos
     def setSize(self, width, height):
         '''
         to set the size of contrast label
@@ -178,7 +175,7 @@ class DicomBasicPanZoomViewer(QLabel):
 
     @Log.LogClassFuncInfos
     def wheelEvent(self, QEvent):
-        delta = QEvent.angleDelta()
+        delta = 0 - QEvent.angleDelta()
         angle = delta.y()
         slice = angle//120
         self.__displayModel.instanceChange(slice)
