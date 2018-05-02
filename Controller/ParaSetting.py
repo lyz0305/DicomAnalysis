@@ -25,3 +25,4 @@ StatusColorR = 100
 StatusColorG = 100
 StatusColorB = 100
 
+SeryChange = 999999

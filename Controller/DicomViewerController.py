@@ -63,7 +63,7 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
         instanceNumbers = list(sery.keys())
         instanceNumbers.sort()
 
-        if changes == 9999:
+        if changes == ParaSetting.SeryChange:
             instance = instanceNumbers[0]
         else:
             index = instanceNumbers.index(ori_instance)
@@ -88,7 +88,6 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
 
         # self.__imgView.contrastLabelPan(x,y)
         # self.__imgView.setContrast(center=center, width=width)
-
 
     @Log.LogClassFuncInfos
     def setModel(self, model):
@@ -129,6 +128,11 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
         self.__layout.addWidget(self.__imgView)
         # self.__layout.setAlignment(Qt.AlignCenter)
         # self.__imgView.resetGeometryByImg()
+
+    @Log.LogClassFuncInfos
+    def seryChange(self, patientName, seryName):
+        self.__displayInfoModel.setDisplayInfo(patientName, seryName, None)
+        self.__displayInfoModel.instanceChange(ParaSetting.SeryChange)
 
 class DicomToolMainPanelController(DicomViewerBasePanelController, Observe):
 
@@ -187,6 +191,11 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
     def __init__(self):
         super(DicomToolThumbnailController,self).__init__()
         self.__patientNames = []
+        self.__activeViewController = None
+
+    @Log.LogClassFuncInfos
+    def setActiveViewController(self, controller):
+        self.__activeViewController = controller
 
     @Log.LogClassFuncInfos
     def initGUI(self):
@@ -371,6 +380,8 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
                     widget.setSelectState(False)
             curwidget.setSelectState(True)
 
+        self.__activeViewController.seryChange(curwidget.getPatientName(), curwidget.getSeryName())
+
     @Log.LogClassFuncInfos
     def showAllImage(self):
 
@@ -419,7 +430,7 @@ class DicomToolPageController(Observe):
     def __init__(self):
         super(DicomToolPageController,self).__init__()
         self.Name = 'DicomToolPageController'
-        self.__thumbnailControlelr = DicomToolThumbnailController()
+        self.__thumbnailController = DicomToolThumbnailController()
         self.__statusController = DicomStatusController()
         self.__dicomViewControllerLists = []
         self.__numberReadDicomHeader = 0
@@ -437,20 +448,20 @@ class DicomToolPageController(Observe):
         self.__sequenceModel.AddObserves(self)
         self.__displayModelsModel.AddObserves(self)
 
-        self.__thumbnailControlelr.initModel()
+        self.__thumbnailController.initModel()
         self.setModelDown()
 
     @Log.LogClassFuncInfos
     def initGUI(self):
 
-        self.__thumbnailControlelr.InitGUI()
+        self.__thumbnailController.InitGUI()
 
     @Log.LogClassFuncInfos
     def setModelDown(self):
-        self.__thumbnailControlelr.setModel(self.__imageNamesModel)
-        self.__thumbnailControlelr.setModel(self.__sequenceModel)
-        self.__thumbnailControlelr.setModel(self.__sequenceInfoModel)
-        self.__thumbnailControlelr.setModel(self.__displayModelsModel)
+        self.__thumbnailController.setModel(self.__imageNamesModel)
+        self.__thumbnailController.setModel(self.__sequenceModel)
+        self.__thumbnailController.setModel(self.__sequenceInfoModel)
+        self.__thumbnailController.setModel(self.__displayModelsModel)
 
     @Log.LogClassFuncInfos
     def setLayout(self, layout):
@@ -467,7 +478,7 @@ class DicomToolPageController(Observe):
 
         self.layout.addLayout(mainLayout)
         self.layout.addWidget(statusLabel,0,Qt.AlignBottom)
-        self.__thumbnailControlelr.setLayout(thumbnailLayout)
+        self.__thumbnailController.setLayout(thumbnailLayout)
         self.__statusController.setLabel(statusLabel)
 
         self.__mainViewLayout = mainPanalLayout
@@ -512,6 +523,10 @@ class DicomToolPageController(Observe):
         dicomToolViewController.setModel(model)
         dicomToolViewController.setModel(self.__sequenceInfoModel)
         dicomToolViewController.initDisplay()
+
+        if len(self.__dicomViewControllerLists) is 0:
+            self.__thumbnailController.setActiveViewController(dicomToolViewController)
+
         self.__dicomViewControllerLists.append(dicomToolViewController)
 
         # currently, only one image can be display
@@ -520,15 +535,6 @@ class DicomToolPageController(Observe):
             # imgView = dicomToolViewController.getImageView()
             layout = QHBoxLayout()
             dicomToolViewController.setLayout(layout)
-
-            #
-            # label = QLabel()
-            # label.setStyleSheet("background: rgb(255,255,255)")
-            # newLayout = QHBoxLayout()
-            # # layout.addWidget(imgView)
-            # newLayout.addWidget(label)
-            # # newLayout.addLayout(layout)
-            # # self.__mainViewLayout.addLayout(newLayout)
             self.__mainViewLayout.addLayout(layout)
             pass
 
@@ -538,13 +544,26 @@ class DicomToolPageController(Observe):
         if ImageNames is None:
             return
 
-        self.__thread = DicomViewerThread.DicomHeaderReaderThread()
-        self.__thread.setSequenceInfo(self.__sequenceInfoModel.getSequenceInfo())
-        self.__thread.aDicomFinishConnect(self.aDicomHeaderRead)
-        self.__thread.allDicomFinishConnect(self.allDicomHeaderRead)
-        self.__thread.setImageNames(ImageNames)
-        self.__thread.start()
+        sequenceInfo = self.__sequenceInfoModel.getSequenceInfo()
+        N = len(ImageNames)
+        reader = sitk.ImageFileReader()
 
+        for i in range(N):
+            dcmName = ImageNames[i]
+            reader.SetFileName(dcmName)
+            reader.LoadPrivateTagsOn()
+            reader.ReadImageInformation()
+            series_description = reader.GetMetaData(Tags['SeriesDescription'])
+            series_number = reader.GetMetaData(Tags['SeriesNumber'])
+            instance_number = reader.GetMetaData(Tags['InstanceNumber'])
+            patient_name = reader.GetMetaData(Tags['PatientName'])
+            seryName = series_number + ' ' + series_description
+
+            self.aDicomHeaderRead(patientName=patient_name, seryName=seryName, instanceNumber=instance_number, path=dcmName)
+            QCoreApplication.processEvents()
+
+        self.allDicomHeaderRead()
+        
     @Log.LogClassFuncInfos
     def aDicomHeaderRead(self, patientName, seryName, instanceNumber, path):
         sequenceInfo = self.__sequenceInfoModel.getSequenceInfo()
@@ -563,7 +582,7 @@ class DicomToolPageController(Observe):
 
     @Log.LogClassFuncInfos
     def allDicomHeaderRead(self):
-        self.__thumbnailControlelr.showAllImage()
+        self.__thumbnailController.showAllImage()
         self.__statusController.setText('%d/%d' %(len(self.__imageNamesModel.getImageNames()), len(self.__imageNamesModel.getImageNames())))
 
 

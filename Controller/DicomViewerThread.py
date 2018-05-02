@@ -41,6 +41,9 @@ class DicomHeaderReaderThread(QThread):
         N = len(self.__imageNames)
         reader = sitk.ImageFileReader()
 
+        # while 1:
+        #     print('run')
+        #     self.msleep(10)
         for i in range(N):
             dcmName = self.__imageNames[i]
             reader.SetFileName(dcmName)
@@ -57,11 +60,6 @@ class DicomHeaderReaderThread(QThread):
             if name not in self.__sequenceInfo[patient_name].keys():
                 self.__sequenceInfo[patient_name][name] = dict()
             self.__sequenceInfo[patient_name][name][int(instance_number)] = dcmName
-
             self.aDicomFinish.emit(patient_name, name, int(instance_number), dcmName)
-
-            self.msleep(50)
-            # time.sleep(0.02)
-            # if i%10 == 0:
-            #     time.sleep(0.5)
+            # self.msleep(50)
         self.allDicomFinish.emit()

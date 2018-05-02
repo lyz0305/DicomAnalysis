@@ -181,7 +181,7 @@ class DicomBasicPanZoomViewer(QLabel):
         delta = QEvent.angleDelta()
         angle = delta.y()
         slice = angle//120
-        self.__displayModel.instenceChange(slice)
+        self.__displayModel.instanceChange(slice)
 
 if __name__ == '__main__':
 
