@@ -28,7 +28,8 @@ class ThumbnailViewer(QLabel):
         # self.info_label.setBackgroundColor(255,255,255)
         self.name_label.setFixedHeight(ParaSetting.ThumbnailSeryNameHeight)
         self.name_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        self.thumbnail_image = DicomBasicPanZoomViewer()
+        self.thumbnail_image = ThumbnailImageViewer()
+        # self.thumbnail_image = DicomBasicPanZoomViewer()
         self.thumbnail_image.setPanAble(False)
         self.thumbnail_image.setZoomAble(False)
         self.thumbnail_image.setContrastAble(False)
@@ -78,3 +79,16 @@ class ThumbnailViewer(QLabel):
     @Log.LogClassFuncInfos
     def getSelectState(self):
         return self.selected
+
+class ThumbnailImageViewer(DicomBasicPanZoomViewer):
+
+    @Log.LogClassFuncInfos
+    def __init__(self, parent=None):
+        super(ThumbnailImageViewer, self).__init__(parent)
+
+    @Log.LogClassFuncInfos
+    def resizeEvent(self, event):
+        geo = self.geometry()
+        self.getContrastLabel().resize(self.width(), self.height())
+        # self.__contrastlabel.resize(self.width(), self.height())
+        self.updateViewer()

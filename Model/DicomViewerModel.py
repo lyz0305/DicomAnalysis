@@ -84,6 +84,7 @@ class DisplayInfoModel(BaseModel):
         self.__patientName = None
         self.__seriesName = None
         self.__instanceNumber = None
+        self.__numChange = 0
 
     @Log.LogClassFuncInfos
     def setDisplayInfo(self, patientName, seriesName, instanceNumber):
@@ -92,7 +93,17 @@ class DisplayInfoModel(BaseModel):
             self.__patientName = patientName
             self.__seriesName = seriesName
             self.__instanceNumber = instanceNumber
+            # self.Notify()
+
+    @Log.LogClassFuncInfos
+    def instenceChange(self, num):
+        if num is not 0:
+            self.__numChange = num
             self.Notify()
+
+    @Log.LogClassFuncInfos
+    def getInstanceChange(self):
+        return self.__numChange
 
     @Log.LogClassFuncInfos
     def getPatientName(self):
@@ -105,6 +116,10 @@ class DisplayInfoModel(BaseModel):
     @Log.LogClassFuncInfos
     def getInstanceNumber(self):
         return self.__instanceNumber
+
+    @Log.LogClassFuncInfos
+    def setInstanceNumber(self, instance):
+        self.__instanceNumber = instance
 
 class DisplayModelsModel(BaseModel):
 

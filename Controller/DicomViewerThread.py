@@ -60,7 +60,7 @@ class DicomHeaderReaderThread(QThread):
 
             self.aDicomFinish.emit(patient_name, name, int(instance_number), dcmName)
 
-            self.msleep(30)
+            self.msleep(50)
             # time.sleep(0.02)
             # if i%10 == 0:
             #     time.sleep(0.5)

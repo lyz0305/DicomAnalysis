@@ -46,7 +46,49 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
 
     @Log.LogClassFuncInfos
     def update(self,model):
-        pass
+
+        if model.Name is self.__displayInfoModel.Name:
+            self.instanceNumberChange()
+
+    @Log.LogClassFuncInfos
+    def instanceNumberChange(self):
+
+        changes = self.__displayInfoModel.getInstanceChange()
+        patientName = self.__displayInfoModel.getPatientName()
+        seryName = self.__displayInfoModel.getSeryName()
+        ori_instance = self.__displayInfoModel.getInstanceNumber()
+
+        sequenceInfo = self.__sequenceInfoModel.getSequenceInfo()
+        sery = sequenceInfo[patientName][seryName]
+        instanceNumbers = list(sery.keys())
+        instanceNumbers.sort()
+
+        if changes == 9999:
+            instance = instanceNumbers[0]
+        else:
+            index = instanceNumbers.index(ori_instance)
+            cur_instance = index + changes
+            if cur_instance >= len(instanceNumbers):
+                instance = instanceNumbers[-1]
+            elif cur_instance < 0:
+                instance = instanceNumbers[0]
+            else:
+                instance = instanceNumbers[cur_instance]
+
+        self.__displayInfoModel.setInstanceNumber(instance)
+
+        imgPath = sequenceInfo[patientName][seryName][instance]
+
+        ds = pydicom.dcmread(imgPath)
+        img = ds.pixel_array
+        img = img.astype(float) * ds.RescaleSlope + ds.RescaleIntercept
+        self.__imgView.setImage(img)
+        center, width = self.__imgView.getContrast()
+        x,y = self.__imgView.getPan()
+
+        # self.__imgView.contrastLabelPan(x,y)
+        # self.__imgView.setContrast(center=center, width=width)
+
 
     @Log.LogClassFuncInfos
     def setModel(self, model):
@@ -72,6 +114,7 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
 
         self.__imgView = DicomBasicPanZoomViewer()
         self.__imgView.setImage(img)
+        self.__imgView.setModel(self.__displayInfoModel)
         self.__layout.addWidget(self.__imgView)
         # self.__imgView.show()
 
@@ -369,9 +412,6 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
         #             img = ds.pixel_array
         #             widget.setImage(img)
 
-
-
-
 class DicomToolPageController(Observe):
 
     @Log.LogClassFuncInfos
@@ -481,13 +521,13 @@ class DicomToolPageController(Observe):
             dicomToolViewController.setLayout(layout)
 
             #
-            label = QLabel()
-            label.setStyleSheet("background: rgb(255,255,255)")
-            newLayout = QHBoxLayout()
-            # layout.addWidget(imgView)
-            newLayout.addWidget(label)
-            # newLayout.addLayout(layout)
-            # self.__mainViewLayout.addLayout(newLayout)
+            # label = QLabel()
+            # label.setStyleSheet("background: rgb(255,255,255)")
+            # newLayout = QHBoxLayout()
+            # # layout.addWidget(imgView)
+            # newLayout.addWidget(label)
+            # # newLayout.addLayout(layout)
+            # # self.__mainViewLayout.addLayout(newLayout)
             self.__mainViewLayout.addLayout(layout)
             pass
 
