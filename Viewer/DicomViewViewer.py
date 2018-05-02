@@ -57,6 +57,7 @@ class ThumbnailViewer(QLabel):
     @Log.LogClassFuncInfos
     def setImage(self, image):
         self.thumbnail_image.setImage(image)
+        self.thumbnail_image.resetContrast()
 
     @Log.LogClassFuncInfos
     def setCharacterBackground(self, r, g, b, a):

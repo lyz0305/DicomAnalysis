@@ -154,6 +154,10 @@ class DicomBasicPanZoomViewer(QLabel):
         return self.__contrastlabel
 
     @Log.LogClassFuncInfos
+    def resetContrast(self):
+        self.__contrastlabel.resetContrast()
+
+    @Log.LogClassFuncInfos
     def mouseMoveEvent(self, QMouseEvent):
         pos = QMouseEvent.pos()
         self.currentPoint = [pos.x(),pos.y()]

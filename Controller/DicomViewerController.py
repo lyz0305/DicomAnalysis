@@ -116,6 +116,7 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
         self.__imgView.setImage(img)
         self.__imgView.setModel(self.__displayInfoModel)
         self.__layout.addWidget(self.__imgView)
+        self.__imgView.resetContrast()
         # self.__imgView.show()
 
     @Log.LogClassFuncInfos

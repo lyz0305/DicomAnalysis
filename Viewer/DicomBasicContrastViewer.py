@@ -50,10 +50,9 @@ class DicomBasicContrastViewer(QLabel):
     def setImage(self,image):
         self.__originalImg = image
         self.updateImgSize()
-        self.resetcontrast()
 
     @Log.LogClassFuncInfos
-    def resetcontrast(self):
+    def resetContrast(self):
         MIN = self.__displayImg.min()
         MAX = self.__displayImg.max()
         center = (MIN + MAX) / 2
