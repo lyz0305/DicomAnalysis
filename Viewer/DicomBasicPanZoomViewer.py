@@ -175,9 +175,9 @@ class DicomBasicPanZoomViewer(QLabel):
 
     @Log.LogClassFuncInfos
     def wheelEvent(self, QEvent):
-        delta = 0 - QEvent.angleDelta()
+        delta = QEvent.angleDelta()
         angle = delta.y()
-        slice = angle//120
+        slice = -angle//120
         self.__displayModel.instanceChange(slice)
 
 if __name__ == '__main__':
