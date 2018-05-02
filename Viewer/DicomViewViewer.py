@@ -5,9 +5,11 @@ from PyQt5.QtCore import *
 
 
 from Controller import Log
-from Viewer.DicomBasicPanZoomViewer import *
+from Viewer.DicomBasicViewer import DicomBasicPanZoomViewer
 from Viewer.AuxiliaryClass import CharacterDisplayLabel
 from Controller import ParaSetting
+
+
 
 class ThumbnailViewer(QLabel):
     '''

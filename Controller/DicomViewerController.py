@@ -12,7 +12,8 @@ from PyQt5.QtCore import *
 from Controller import ParaSetting
 from Controller import Log
 from Controller import DicomViewerThread
-from Viewer.DicomBasicPanZoomViewer import DicomBasicPanZoomViewer
+from Viewer.DicomBasicViewer import DicomBasicImageViewer
+from Oplayer.PatientInfoTextOplayer import PatientInfoTextOplayer
 import pydicom
 
 class DicomToolViewController(DicomViewerBasePanelController, Observe):
@@ -31,12 +32,17 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
         self.__imgView = QLabel()
         self.__sequenceInfoModel = SequenceInfoModel()
 
-        self.__imgView = DicomBasicPanZoomViewer()
+        self.__imgView = DicomBasicImageViewer()
         self.__imgView.setModel(self.__displayInfoModel)
-
 
         self.__scrollBar = QScrollBar()
         self.__scrollBar.valueChanged.connect(self.scrollSliderChange)
+
+    @Log.LogClassFuncInfos
+    def initOplayer(self):
+        painter = QPainter(self.__imgView)
+        self.__patientInfoTextOplayer = PatientInfoTextOplayer(painter)
+        pass
 
     @Log.LogClassFuncInfos
     def getModel(self, name):
@@ -124,6 +130,9 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
         self.__imgView.setImage(img)
         self.__imgView.resetContrast()
         self.__imgView.setModel(self.__displayInfoModel)
+
+        self.initOplayer()
+        self.__imgView.addOplayer(self.__patientInfoTextOplayer)
 
     @Log.LogClassFuncInfos
     def getImageView(self):

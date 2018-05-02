@@ -1,7 +1,6 @@
 
-from Viewer.DicomBasicContrastViewer import *
-from Viewer.DicomBasicPanZoomViewer import *
 
+from Viewer.DicomBasicViewer import DicomBasicPanZoomViewer
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *

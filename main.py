@@ -7,7 +7,6 @@ import sys
 import numpy as np
 from scipy.misc import imresize
 import qimage2ndarray
-from Viewer.DicomBasicContrastViewer import *
 from Viewer.DicomToolWindow import *
 
 import os

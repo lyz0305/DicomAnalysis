@@ -9,6 +9,7 @@ class DicomViewerBasePanelController:
         self.Name = self.__class__.__name__
         self.initModel()
         self.initGUI()
+        self.initOplayer()
 
     @Log.LogClassFuncInfos
     def initModel(self):
@@ -25,3 +26,7 @@ class DicomViewerBasePanelController:
     @Log.LogClassFuncInfos
     def update(self, model):
         sys.exit('Controller must rewrite the Update function')
+
+    @Log.LogClassFuncInfos
+    def initOplayer(self):
+        pass
