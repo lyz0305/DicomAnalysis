@@ -9,7 +9,6 @@ class BasicOplayer():
     @Log.LogClassFuncInfos
     def mouseMoveEvent(self, QMouseEvent):
         pos = QMouseEvent.pos()
-        print(pos.x(), pos.y())
         pass
 
 

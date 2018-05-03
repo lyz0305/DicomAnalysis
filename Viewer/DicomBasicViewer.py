@@ -40,7 +40,8 @@ class DicomBasicContrastViewer(QLabel):
     def setContrast(self,center,width):
         self.__contrast['center'] = center
         self.__contrast['width'] = width
-        self.updateViewer()
+        # self.updateViewer()
+        self.update()
 
     @Log.LogClassFuncInfos
     def setImage(self,image):
@@ -72,7 +73,8 @@ class DicomBasicContrastViewer(QLabel):
         s = min(size)
         zoomImg = imresize(self.__originalImg, [s, s], 'lanczos', mode='I')
         self.__displayImg = zoomImg
-        self.updateViewer()
+        # self.updateViewer()
+        self.update()
 
     @Log.LogClassFuncInfos
     def resize(self, width, height):
@@ -126,16 +128,16 @@ class DicomBasicContrastViewer(QLabel):
         self.__oldPoint = [pos.x(), pos.y()]
         QMouseEvent.ignore()
 
-    # @Log.LogClassFuncInfos
-    # def paintEvent(self, QPaintEvent):
-    #
-    #     # a = QPoint(50, 50)
-    #     # painter = QPainter(self)
-    #     # painter.drawText(a, 'hello,world\n666')
-    #     # painter.setPen(QColor(255, 255, 255))
-    #     # self.setPainter(painter)
-    #     self.updateViewer()
-    #     pass
+    @Log.LogClassFuncInfos
+    def paintEvent(self, QPaintEvent):
+        super(DicomBasicContrastViewer, self).paintEvent(QPaintEvent)
+        # a = QPoint(50, 50)
+        # painter = QPainter(self)
+        # painter.drawText(a, 'hello,world\n666')
+        # painter.setPen(QColor(255, 255, 255))
+        # self.setPainter(painter)
+        self.updateViewer()
+        pass
 
 class DicomBasicPanZoomViewer(QLabel):
 
@@ -204,6 +206,7 @@ class DicomBasicPanZoomViewer(QLabel):
         x = geo.x() + geo.width() / 2 - width / 2
         y = geo.y() + geo.height() / 2 - height / 2
         self.__contrastlabel.setGeometry(x, y, width, height)
+        # print('center: x: %d, y: %d\n' % (geo.x() + geo.width() / 2, geo.y() + geo.height() / 2))
 
     @Log.LogClassFuncInfos
     def setModel(self, model):
@@ -234,11 +237,13 @@ class DicomBasicPanZoomViewer(QLabel):
             self.__contrastlabel.setGeometry(x, y, imgWidth, imgHeight)
         else:
             self.__contrastlabel.resize(self.width(), self.height())
-        self.updateViewer()
+        # self.updateViewer()
 
     @Log.LogClassFuncInfos
     def updateViewer(self):
-        self.__contrastlabel.updateViewer()
+        # self.__contrastlabel.updateViewer()
+        # self.update()
+        pass
 
     @Log.LogClassFuncInfos
     def mousePressEvent(self, QMouseEvent):
