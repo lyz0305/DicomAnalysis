@@ -144,6 +144,27 @@ class DisplayModelsModel(BaseModel):
         self.__displayModels.append(model)
         self.Notify()
 
+class ROIModel(BaseModel):
+
+    @Log.LogClassFuncInfos
+    def __init__(self):
+        super(ROIModel, self).__init__()
+        self.__roi = []
+
+    @Log.LogClassFuncInfos
+    def setROI(self, roi):
+
+        if len(roi) is 0 and len(self.__roi) is 0:
+            return
+
+        if roi is not self.__roi:
+            self.__roi = roi
+            self.Notify()
+
+    @Log.LogClassFuncInfos
+    def getROI(self):
+        return self.__roi
+
 if __name__=='__main__':
 
     a = ImageNamesModel()

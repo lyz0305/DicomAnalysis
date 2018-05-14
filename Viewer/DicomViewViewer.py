@@ -5,10 +5,9 @@ from PyQt5.QtCore import *
 
 
 from Controller import Log
-from Viewer.DicomBasicViewer import DicomBasicPanZoomViewer
 from Viewer.AuxiliaryClass import CharacterDisplayLabel
 from Controller import ParaSetting
-
+from Viewer.DicomBasicViewer import DicomBasicDicomImageViewer
 
 
 class ThumbnailViewer(QLabel):
@@ -59,7 +58,6 @@ class ThumbnailViewer(QLabel):
     @Log.LogClassFuncInfos
     def setImage(self, image):
         self.thumbnail_image.setImage(image)
-        self.thumbnail_image.resetContrast()
 
     @Log.LogClassFuncInfos
     def setCharacterBackground(self, r, g, b, a):
@@ -83,15 +81,15 @@ class ThumbnailViewer(QLabel):
     def getSelectState(self):
         return self.selected
 
-class ThumbnailImageViewer(DicomBasicPanZoomViewer):
+class ThumbnailImageViewer(DicomBasicDicomImageViewer):
 
     @Log.LogClassFuncInfos
-    def __init__(self, parent=None):
-        super(ThumbnailImageViewer, self).__init__(parent)
+    def __init__(self):
+        super(ThumbnailImageViewer, self).__init__()
 
     @Log.LogClassFuncInfos
     def resizeEvent(self, event):
-        geo = self.geometry()
-        self.getContrastLabel().resize(self.width(), self.height())
-        # self.__contrastlabel.resize(self.width(), self.height())
-        self.updateViewer()
+        super(ThumbnailImageViewer, self).resizeEvent(event)
+        self.resetParaByPanel()
+
+

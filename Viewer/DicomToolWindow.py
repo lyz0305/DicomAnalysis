@@ -1,6 +1,6 @@
 
 
-from Viewer.DicomBasicViewer import DicomBasicPanZoomViewer
+# from Viewer.DicomBasicViewer import DicomBasicPanZoomViewer
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -9,10 +9,12 @@ from Controller.DicomViewerController import *
 from Model.DicomViewerModel import *
 import os
 from Controller import Log
-
+from Controller import Status
 
 
 class DicomToolWindow(QMainWindow):
+
+    freeHandROISignal = pyqtSignal(bool)
 
     @Log.LogClassFuncInfos
     def __init__(self, parent=None):
@@ -23,13 +25,15 @@ class DicomToolWindow(QMainWindow):
         self.setAcceptDrops(True)
         self.showMaximized()
 
+        self.DicomToolController = DicomToolPageController()
+        self.InitModel()
+        self.InitGUI()
+
         self.createActions()
         self.createMenus()
         self.createToolBars()
 
-        self.DicomToolController = DicomToolPageController()
-        self.InitModel()
-        self.InitGUI()
+
 
     @Log.LogClassFuncInfos
     def InitModel(self):
@@ -44,6 +48,7 @@ class DicomToolWindow(QMainWindow):
         self.layout.setContentsMargins(0,0,0,0)
         widget.setLayout(self.layout)
         self.DicomToolController.setLayout(self.layout)
+        self.freeHandROISignal.connect(self.DicomToolController.freeHandROI)
 
     @Log.LogClassFuncInfos
     def createPanel(self):
@@ -54,14 +59,32 @@ class DicomToolWindow(QMainWindow):
         self.zoomAction = QAction(QIcon('Icons\\Zoom.png'), self.tr("Zoom"), self)
         self.zoomAction.setStatusTip(self.tr("Zoom"))
         self.zoomAction.setCheckable(True)
+        self.zoomAction.triggered.connect(self.setContrastPanZoom)
 
         self.panAction = QAction(QIcon('Icons\\Pan.png'), self.tr("Pan"), self)
         self.panAction.setStatusTip(self.tr("Pan"))
         self.panAction.setCheckable(True)
+        self.panAction.triggered.connect(self.setContrastPanZoom)
 
         self.contrastAction = QAction(QIcon('Icons\\Contrast.png'),self.tr("Contrast"),self)
         self.contrastAction.setStatusTip(self.tr("Contrast"))
         self.contrastAction.setCheckable(True)
+        self.contrastAction.triggered.connect(self.setContrastPanZoom)
+
+        self.freeHandROIAction = QAction(QIcon('Icons\\FreeHandROI.png'),self.tr("FreeHand"),self)
+        self.freeHandROIAction.setStatusTip(self.tr("FreeHandROI"))
+        self.freeHandROIAction.setCheckable(True)
+        self.freeHandROIAction.setEnabled(False)
+        self.freeHandROIAction.triggered.connect(self.freeHandROI)
+
+    @Log.LogClassFuncInfos
+    def freeHandROI(self, checked=False):
+        self.freeHandROISignal.emit(checked)
+
+    @Log.LogClassFuncInfos
+    def setContrastPanZoom(self, checked=False):
+        Status.setBTNToNormal()
+
 
     @Log.LogClassFuncInfos
     def createMenus(self):
@@ -77,6 +100,7 @@ class DicomToolWindow(QMainWindow):
         fileToolBar.addAction(self.panAction)
         fileToolBar.addAction(self.zoomAction)
         fileToolBar.addSeparator()
+        fileToolBar.addAction(self.freeHandROIAction)
 
     @Log.LogClassFuncInfos
     def dragEnterEvent(self, QEvent ):
@@ -120,3 +144,5 @@ class DicomToolWindow(QMainWindow):
                 if len(extension[1]) == 0 or extension[1].lower() is '.dcm':
                     ImageNames.append(file)
         self.ImageNamesModel.setImageNames(ImageNames)
+
+        self.freeHandROIAction.setEnabled(True)

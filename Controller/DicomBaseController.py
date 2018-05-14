@@ -2,14 +2,20 @@
 from Controller import Log
 import sys
 
-class DicomViewerBasePanelController:
-
+class DicomBaseController:
+    '''
+    a base class
+    '''
     @Log.LogClassFuncInfos
     def __init__(self):
         self.Name = self.__class__.__name__
-        self.initModel()
         self.initGUI()
         self.initOplayer()
+        self.initModel()
+
+    @Log.LogClassFuncInfos
+    def initOplayer(self):
+        sys.exit('Controller must rewrite the InitModel function')
 
     @Log.LogClassFuncInfos
     def initModel(self):

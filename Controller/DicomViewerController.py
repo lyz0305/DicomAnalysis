@@ -1,6 +1,6 @@
 
 from Controller.Observe import *
-from Controller.DicomViewerBaseController import *
+from Controller.DicomBaseController import *
 from Model.DicomViewerModel import *
 import SimpleITK as sitk
 from Controller.TagName import Tags
@@ -12,37 +12,36 @@ from PyQt5.QtCore import *
 from Controller import ParaSetting
 from Controller import Log
 from Controller import DicomViewerThread
-from Viewer.DicomBasicViewer import DicomBasicImageViewer
+from Viewer.DicomBasicViewer import DicomBasicDicomImageViewer
 from Oplayer.PatientInfoTextOplayer import PatientInfoTextOplayer
+from Oplayer.ROIOplayer import FreeHandROIOplayer
+from Controller.DicomSidePanelController import DicomSidePanelController
 import pydicom
 
-class DicomToolViewController(DicomViewerBasePanelController, Observe):
+class DicomToolViewController(DicomBaseController, Observe):
     '''
     the dicom may display two or more image in the same time
     we need a controller to control each image
     '''
     @Log.LogClassFuncInfos
     def __init__(self):
-        self.Name = 'DicomToolViewController'
         super(DicomToolViewController, self).__init__()
+        self.__ROI = dict()
 
     @Log.LogClassFuncInfos
     def initGUI(self):
         self.__layout = QHBoxLayout()
-        self.__imgView = QLabel()
-        self.__sequenceInfoModel = SequenceInfoModel()
-
-        self.__imgView = DicomBasicImageViewer()
-        self.__imgView.setModel(self.__displayInfoModel)
-
+        self.__imgView = DicomBasicDicomImageViewer()
         self.__scrollBar = QScrollBar()
         self.__scrollBar.valueChanged.connect(self.scrollSliderChange)
 
     @Log.LogClassFuncInfos
     def initOplayer(self):
-        painter = QPainter(self.__imgView)
-        self.__patientInfoTextOplayer = PatientInfoTextOplayer(painter)
-        pass
+        self.__patientInfoTextOplayer = PatientInfoTextOplayer(self.__imgView)
+        self.__freeHandROIOplayer = FreeHandROIOplayer(self.__imgView)
+
+        self.__imgView.addOplayer(self.__patientInfoTextOplayer)
+        self.__imgView.addOplayer(self.__freeHandROIOplayer)
 
     @Log.LogClassFuncInfos
     def getModel(self, name):
@@ -55,12 +54,27 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
     @Log.LogClassFuncInfos
     def initModel(self):
         self.__displayInfoModel = DisplayInfoModel()
+        self.__sequenceInfoModel = SequenceInfoModel()
+        self.__roiModel = ROIModel()
+
+        self.__roiModel.AddObserves(self)
+
+        self.setModelDown()
 
     @Log.LogClassFuncInfos
     def update(self,model):
 
         if model.Name is self.__displayInfoModel.Name:
             self.instanceNumberChange()
+        elif model.Name is self.__roiModel.Name:
+            self.roiChange()
+
+    @Log.LogClassFuncInfos
+    def roiChange(self):
+
+        instance = self.__displayInfoModel.getInstanceNumber()
+        roi = self.__roiModel.getROI()
+        self.__ROI[instance] = roi
 
     @Log.LogClassFuncInfos
     def instanceNumberChange(self):
@@ -77,6 +91,7 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
 
         if changes == ParaSetting.SeryChange:
             instance = instanceNumbers[0]
+            self.__ROI = dict()
         else:
             index = instanceNumbers.index(ori_instance)
             cur_instance = index + changes
@@ -89,6 +104,10 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
 
         self.__displayInfoModel.setInstanceNumber(instance)
         self.__scrollBar.setValue(instanceNumbers.index(instance))
+        if instance in self.__ROI.keys():
+            self.__roiModel.setROI( self.__ROI[instance] )
+        else:
+            self.__roiModel.setROI([])
 
         imgPath = sequenceInfo[patientName][seryName][instance]
 
@@ -96,8 +115,8 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
         img = ds.pixel_array
         img = img.astype(float) * ds.RescaleSlope + ds.RescaleIntercept
         self.__imgView.setImage(img)
-        center, width = self.__imgView.getContrast()
-        x,y = self.__imgView.getPan()
+        # center, width = self.__imgView.getContrast()
+        # x,y = self.__imgView.getPan()
 
         # self.__imgView.contrastLabelPan(x,y)
         # self.__imgView.setContrast(center=center, width=width)
@@ -109,6 +128,13 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
             self.__displayInfoModel.AddObserves(self)
         elif model.Name is self.__sequenceInfoModel.Name:
             self.__sequenceInfoModel = model
+        self.setModelDown()
+
+    @Log.LogClassFuncInfos
+    def setModelDown(self):
+        self.__imgView.setModel(self.__displayInfoModel)
+        self.__imgView.setModel(self.__sequenceInfoModel)
+        self.__imgView.setModel(self.__roiModel)
 
     @Log.LogClassFuncInfos
     def initDisplay(self):
@@ -128,11 +154,10 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
 
 
         self.__imgView.setImage(img)
-        self.__imgView.resetContrast()
-        self.__imgView.setModel(self.__displayInfoModel)
 
-        self.initOplayer()
-        self.__imgView.addOplayer(self.__patientInfoTextOplayer)
+
+
+
 
     @Log.LogClassFuncInfos
     def getImageView(self):
@@ -159,10 +184,10 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
         patientName = self.__displayInfoModel.getPatientName()
         seryName = self.__displayInfoModel.getSeryName()
         sery = sequenceInfo[patientName][seryName]
-        instanceNumbers = list(sery.keys())
-        self.__scrollBar.setRange(0, len(instanceNumbers)-1)
+        instance = list(sery.keys())
+        instanceNumber = self.__displayInfoModel.getInstanceNumber()
+        self.__scrollBar.setRange(0, len(instance)-1)
         self.__scrollBar.setSingleStep(1)
-
 
 
     @Log.LogClassFuncInfos
@@ -179,7 +204,7 @@ class DicomToolViewController(DicomViewerBasePanelController, Observe):
         change = val - index
         self.__displayInfoModel.instanceChange(change)
 
-class DicomToolMainPanelController(DicomViewerBasePanelController, Observe):
+class DicomToolMainPanelController(DicomBaseController, Observe):
 
     @Log.LogClassFuncInfos
     def __init__(self):
@@ -230,7 +255,7 @@ class DicomStatusController:
     def setText(self, str):
         self.__label.setText(str)
 
-class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
+class DicomToolThumbnailController(DicomBaseController,Observe):
 
     @Log.LogClassFuncInfos
     def __init__(self):
@@ -454,24 +479,6 @@ class DicomToolThumbnailController(DicomViewerBasePanelController,Observe):
                 img = ds.pixel_array
                 widget.setImage(img)
 
-        # for listWidget in self.__listWidgets:
-        #     N = listWidget.count()
-        #     patientName = listWidget.getPatientName()
-        #     for i in range(N):
-        #         widgetItem = listWidget.item(i)
-        #         widget = listWidget.itemWidget(widgetItem)
-        #         if isinstance(widget, ThumbnailViewer):
-        #             seryName = widget.getSeriesName()
-        #             images = sequenceInfo[patientName][seryName]
-        #
-        #             instance = list(images.keys())
-        #             instance.sort()
-        #             midInstance = instance[len(instance)//2]
-        #             imgPath = images[midInstance]
-        #             # imgPath = images[instance[0]]
-        #             ds = pydicom.dcmread(imgPath)
-        #             img = ds.pixel_array
-        #             widget.setImage(img)
 
 class DicomToolPageController(Observe):
 
@@ -481,6 +488,8 @@ class DicomToolPageController(Observe):
         self.Name = 'DicomToolPageController'
         self.__thumbnailController = DicomToolThumbnailController()
         self.__statusController = DicomStatusController()
+        self.__sidePanelController = DicomSidePanelController()
+
         self.__dicomViewControllerLists = []
         self.__numberReadDicomHeader = 0
 
@@ -502,7 +511,6 @@ class DicomToolPageController(Observe):
 
     @Log.LogClassFuncInfos
     def initGUI(self):
-
         self.__thumbnailController.InitGUI()
 
     @Log.LogClassFuncInfos
@@ -519,8 +527,12 @@ class DicomToolPageController(Observe):
         mainLayout = QHBoxLayout()
         thumbnailLayout = QVBoxLayout()
         mainPanalLayout = QVBoxLayout()
+        sidePanelLayout = QVBoxLayout()
         mainLayout.addLayout(thumbnailLayout)
         mainLayout.addLayout(mainPanalLayout)
+        mainLayout.addLayout(sidePanelLayout)
+
+        self.mainLayout = mainLayout
 
         statusLabel = QLabel()
 
@@ -529,6 +541,7 @@ class DicomToolPageController(Observe):
         self.layout.addWidget(statusLabel,0,Qt.AlignBottom)
         self.__thumbnailController.setLayout(thumbnailLayout)
         self.__statusController.setLabel(statusLabel)
+        self.__sidePanelController.setLayout(sidePanelLayout)
 
         self.__mainViewLayout = mainPanalLayout
 
@@ -538,8 +551,14 @@ class DicomToolPageController(Observe):
             self.__imageNamesModel = model
             self.__imageNamesModel.AddObserves(self)
 
-
         self.setModelDown()
+
+    @Log.LogClassFuncInfos
+    def freeHandROI(self, checked=False):
+        if checked is True:
+            self.__sidePanelController.initFreeHandROIGUI()
+        else:
+            self.__sidePanelController.hide()
 
     @Log.LogClassFuncInfos
     def update(self,model):
@@ -573,6 +592,7 @@ class DicomToolPageController(Observe):
         dicomToolViewController.setModel(self.__sequenceInfoModel)
         dicomToolViewController.initDisplay()
 
+
         if len(self.__dicomViewControllerLists) is 0:
             self.__thumbnailController.setActiveViewController(dicomToolViewController)
 
@@ -593,6 +613,8 @@ class DicomToolPageController(Observe):
         if ImageNames is None:
             return
 
+        import random
+        random.shuffle(ImageNames)
         sequenceInfo = self.__sequenceInfoModel.getSequenceInfo()
         N = len(ImageNames)
         reader = sitk.ImageFileReader()

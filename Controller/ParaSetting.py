@@ -21,8 +21,18 @@ ThumbnailSelectedColorR = 200
 ThumbnailSelectedColorG = 200
 ThumbnailSelectedColorB = 200
 
+SidePanelWidth = 150
+
 StatusColorR = 100
 StatusColorG = 100
 StatusColorB = 100
 
 SeryChange = 999999
+
+ROIDrawColorR = 255
+ROIDrawColorG = 255
+ROIDrawColorB = 255
+
+ROIEraseColorR = 255
+ROIEraseColorG = 0
+ROIEraseColorB = 0

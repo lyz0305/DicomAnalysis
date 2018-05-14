@@ -6,6 +6,9 @@ Environment:
 python 3.5
 Qt5.1
 SimpleITK
+cv2
+qimage2ndarray
+
 
 the explanation of Version:
 
@@ -18,3 +21,7 @@ C: a update about a module
 Name rules:
 
 ex. setImage
+
+Write To exe:
+
+pyinstaller main.py -i icon.ico --noconsole

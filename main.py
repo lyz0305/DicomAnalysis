@@ -5,7 +5,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import Qt
 import sys
 import numpy as np
-from scipy.misc import imresize
 import qimage2ndarray
 from Viewer.DicomToolWindow import *
 
@@ -15,6 +14,6 @@ if os.path.exists('DicomTool.log'):
 
 app = QApplication(sys.argv)
 window = DicomToolWindow()
-# window.setWindowFlags(window.windowFlags() | Qt.WindowStaysOnTopHint)
+window.setWindowIcon(QIcon('Icons/D.png'))
 window.show()
 app.exec_()

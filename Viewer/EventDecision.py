@@ -1,5 +1,7 @@
 from PyQt5.QtCore import Qt
+from Controller import Status
 
+Other = -1
 Pan = 0
 Zoom = 1
 Contrast = 2
@@ -11,10 +13,13 @@ def MouseMoveEvent(QMouseEvent):
     :param QMouseEvent:
     :return:
     '''
+    if Status.getBTNStatus() is not Status.BTNNormal:
+        return Other
     if QMouseEvent.buttons() == Qt.LeftButton:
         return Pan
     elif QMouseEvent.buttons() == Qt.MidButton:
         return Contrast
     elif QMouseEvent.buttons() == Qt.RightButton:
         return Zoom
+
 
